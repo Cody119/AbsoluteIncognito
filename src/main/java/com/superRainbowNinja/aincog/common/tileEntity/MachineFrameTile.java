@@ -12,6 +12,7 @@ import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
 import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.network.*;
 import com.superRainbowNinja.aincog.util.*;
+import com.superRainbowNinja.aincog.util.DataHandle.IntegerHandle;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.util.EnumParticleTypes;
@@ -31,6 +32,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
+import javax.crypto.Mac;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
