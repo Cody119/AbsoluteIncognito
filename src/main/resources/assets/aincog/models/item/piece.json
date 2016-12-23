@@ -1,0 +1,44 @@
+{
+    "parent": "aincog:item/component",
+    "textures": {
+        "0": "aincog:blocks/machine_frame_detail"
+    },
+    "elements": [
+        {
+            "name": "Cube",
+            "from": [ 7.0, 7.5, 7.0 ], 
+            "to": [ 9.0, 8.5, 9.0 ], 
+            "faces": {
+                "north": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 1.0 ] },
+                "east": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 1.0 ] },
+                "south": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 1.0 ] },
+                "west": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 1.0 ] },
+                "up": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 2.0 ] },
+                "down": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 2.0 ] }
+            }
+        },
+        {
+            "name": "LongTrim",
+            "from": [ 7.0, 8.5, 7.0 ], 
+            "to": [ 7.5, 9.0, 9.0 ], 
+            "faces": {
+                "north": { "texture": "#0", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+                "east": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+                "south": { "texture": "#0", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+                "west": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+                "up": { "texture": "#0", "uv": [ 0.0, 0.0, 0.5, 2.0 ] }
+            }
+        },
+        {
+            "name": "ShortTrim",
+            "from": [ 7.5, 8.5, 7.0 ], 
+            "to": [ 9.0, 9.0, 7.5 ], 
+            "faces": {
+                "north": { "texture": "#0", "uv": [ 0.0, 0.0, 1.5, 0.5 ] },
+                "east": { "texture": "#0", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+                "south": { "texture": "#0", "uv": [ 0.0, 0.0, 1.5, 0.5 ] },
+                "up": { "texture": "#0", "uv": [ 0.0, 0.0, 1.5, 0.5 ] }
+            }
+        }
+    ]
+}

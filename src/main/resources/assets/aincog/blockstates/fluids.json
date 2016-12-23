@@ -1,0 +1,18 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "forge:fluid",
+        "transform": "forge:default-item"
+    },
+    "variants": {
+        "green_crystal_fluid": [{
+            "custom": { "fluid": "green_crystal" }
+        }],
+        "red_crystal_fluid": [{
+            "custom": { "fluid": "red_crystal" }
+        }],
+        "blue_crystal_fluid": [{
+            "custom": { "fluid": "blue_crystal" }
+        }]
+    }
+}

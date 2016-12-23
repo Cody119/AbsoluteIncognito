@@ -1,0 +1,21 @@
+{
+	"parent": "block/block",
+    "__comment":"Similar to the block transformations",
+    "display": {
+        "thirdperson_righthand": {
+            "rotation": [ 75, 45, 0 ],
+            "translation": [ 0, 2.5, 0],
+            "scale": [ 0.45, 0.45, 0.45 ]
+        },
+        "firstperson_righthand": {
+            "rotation": [ 0, 45, 0 ],
+            "translation": [ 0, 1, 0 ],
+            "scale": [ 0.45, 0.45, 0.45 ]
+        },
+        "firstperson_lefthand": {
+            "rotation": [ 0, 225, 0 ],
+            "translation": [ 0, 1, 0 ],
+            "scale": [ 0.45, 0.45, 0.45 ]
+        }
+    }
+}

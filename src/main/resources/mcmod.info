@@ -1,0 +1,16 @@
+[
+{
+  "modid": "aincog",
+  "name": "Absolute Incognito",
+  "description": "Modular Based Tech Mod",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SuperRainbowNinja"],
+  "credits": "Me, i guess",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

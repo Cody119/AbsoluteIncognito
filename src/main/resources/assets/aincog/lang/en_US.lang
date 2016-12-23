@@ -1,0 +1,16 @@
+#items
+item.aincog:xxred_smurfxx.name=xXRed_SmurfXx
+item.aincog:green_crystal.name=Green Crystal
+item.aincog:blue_crystal.name=Blue Crystal
+item.aincog:red_crystal.name=Red Crystal
+item.aincog:white_crystal.name=White Crystal
+item.aincog:laser_sword.name=Laser Sword
+item.aincog:makeshift_core.name=Makeshift Core
+item.aincog:coil.name=Coil
+item.aincog:machine_lock.name=Machine Lock
+
+#Creative Tab
+itemGroup.aincog=Absolout Incognito
+
+#Blocks
+tile.aincog:machine_frame.name=Machine Frame

@@ -1,0 +1,23 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "textures": {
+            "0": "aincog:blocks/machine_frame",
+            "2": "aincog:blocks/machine_frame_detail",
+            "particle": "aincog:blocks/machine_frame"
+        },
+        "model": "aincog:frame_base"
+    },
+    "variants": {
+    	"normal": [{
+
+        }],
+        "locked": {
+            "true": {
+                "submodel": "aincog:machine_lock"
+            },
+            "false": {
+            }
+        }
+    }
+}
