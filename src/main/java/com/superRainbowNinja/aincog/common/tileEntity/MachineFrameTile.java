@@ -32,6 +32,8 @@ import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * Created by SuperRainbowNinja on 10/10/2016.
