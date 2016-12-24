@@ -174,26 +174,4 @@ public final class NBTHelper {
     public static void writePositions(List<ExactPosition> pos, NBTTagCompound compound, String saveName) {
         NBTHelper.writeList(pos, compound, saveName, CompPosReadWriter);
     }
-
-
-
-
-    //move
-    public static void writeFluid(ByteBuf buf, FluidStack stack) {
-        if (stack == null) {
-            ByteBufUtils.writeUTF8String(buf, "");
-            return;
-        }
-        ByteBufUtils.writeUTF8String(buf, stack.getFluid().getName());
-        buf.writeInt(stack.amount);
-        ByteBufUtils.writeTag(buf, stack.tag);
-    }
-
-    public static FluidStack readFluid(ByteBuf buf) {
-        Fluid fluid = FluidRegistry.getFluid(ByteBufUtils.readUTF8String(buf));
-        if (fluid != null) {
-            return new FluidStack(fluid, buf.readInt(), ByteBufUtils.readTag(buf));
-        }
-        return null;
-    }
 }
