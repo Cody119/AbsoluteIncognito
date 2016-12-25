@@ -3,6 +3,8 @@ package com.superRainbowNinja.aincog.util;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.function.BiConsumer;
+
 /**
  * Created by SuperRainbowNinja on 6/12/2016.
  */
@@ -140,6 +142,10 @@ public class ExactPosition implements IRenderPos{
 
     public static ExactPosition getPosFromCo2(float x, float y, float z) {
         return new ExactPosition(twoPartSplit(x), twoPartSplit(y), twoPartSplit(z));
+    }
+
+    public static void readPosition(ByteBuf buf, ExactPosition pos) {
+        pos.toBytes(buf);
     }
 
     public static final float THRESHOLD = 0.5f;

@@ -1,7 +1,7 @@
 package com.superRainbowNinja.aincog.util.DataHandle;
 
 import com.superRainbowNinja.aincog.util.BufferUtils;
-import com.superRainbowNinja.aincog.util.NBTHelper;
+import com.superRainbowNinja.aincog.util.NBTUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,21 +15,17 @@ import java.util.function.Function;
 public class InvHandle<T> implements IFieldHandle<T> {
 
     protected String name;
-    protected boolean dynamicInv;
     protected Function<T, IInventory> getter;
     protected BiConsumer<T, Integer> sizeHandle;
 
     public InvHandle(String nameIn, Function<T, IInventory> getterIn) {
-        name = nameIn;
-        getter = getterIn;
-        dynamicInv = false;
+        this(nameIn, getterIn, null);
     }
 
     public InvHandle(String nameIn, Function<T, IInventory> getterIn, BiConsumer<T, Integer> reSizer) {
         name = nameIn;
         getter = getterIn;
         sizeHandle = reSizer;
-        dynamicInv = true;
     }
 
     @Override
@@ -39,23 +35,26 @@ public class InvHandle<T> implements IFieldHandle<T> {
 
     @Override
     public void writeNBT(NBTTagCompound compound, T object) {
-
+        NBTUtils.writeInventory(getter.apply(object), compound, name);
     }
 
     @Override
     public void readNBT(NBTTagCompound compound, T object) {
-
+        if (sizeHandle != null) {
+            sizeHandle.accept(object, NBTUtils.readInvLength(compound, name));
+        }
+        NBTUtils.readInventory(getter.apply(object), compound, name);
     }
 
     @Override
     public void toBytes(ByteBuf buf, T object) {
-        BufferUtils.writeInventory(buf, getter.apply(object), dynamicInv);
+        BufferUtils.writeInventory(buf, getter.apply(object), sizeHandle != null);
     }
 
     @Override
     public void fromBytes(ByteBuf buf, T object) {
         IInventory inv = getter.apply(object);
-        if (dynamicInv) {
+        if (sizeHandle != null) {
             sizeHandle.accept(object, BufferUtils.readInvLength(buf));
         }
         BufferUtils.readInvItems(buf, inv);

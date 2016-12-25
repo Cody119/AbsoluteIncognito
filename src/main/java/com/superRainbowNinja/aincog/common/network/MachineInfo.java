@@ -3,9 +3,8 @@ package com.superRainbowNinja.aincog.common.network;
 import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
 import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
-import com.superRainbowNinja.aincog.util.EnumPosition;
 import com.superRainbowNinja.aincog.util.ExactPosition;
-import com.superRainbowNinja.aincog.util.NBTHelper;
+import com.superRainbowNinja.aincog.util.NBTUtils;
 import com.superRainbowNinja.aincog.util.Operation;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
@@ -176,16 +175,16 @@ public class MachineInfo {
     }
 
     public NBTTagCompound writeNBT(NBTTagCompound compound) {
-        NBTHelper.writeInventoryArray(inv, compound, KEY_INVENTORY);
-        NBTHelper.writeInventory(compItems, compound, KEY_COMP_ITEMS);
-        NBTHelper.writePositions(compPos, compound, KEY_COMP_POS);
+        NBTUtils.writeInventoryArray(inv, compound, KEY_INVENTORY);
+        NBTUtils.writeInventory(compItems, compound, KEY_COMP_ITEMS);
+        NBTUtils.writePositions(compPos, compound, KEY_COMP_POS);
 
         compound.setInteger(KEY_ENERGY, energy);
         compound.setBoolean(KEY_LOCKED, locked);
 
         if (locked) {
             compound.setString(KEY_LOGIC_NAME, logic.getName());
-            NBTHelper.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
+            NBTUtils.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
         }
 
         if (core != null) {
@@ -199,16 +198,16 @@ public class MachineInfo {
     }
 
     public void readNBT(NBTTagCompound compound) {
-        inv = NBTHelper.readInventoryArray(compound, KEY_INVENTORY);
-        compItems = NBTHelper.readInventory(compound, KEY_COMP_ITEMS);
-        compPos = NBTHelper.readPositions(compound, KEY_COMP_POS);
+        inv = NBTUtils.readInventoryArray(compound, KEY_INVENTORY);
+        compItems = NBTUtils.readInventory(compound, KEY_COMP_ITEMS);
+        compPos = NBTUtils.readPositions(compound, KEY_COMP_POS);
 
         energy = compound.getInteger(KEY_ENERGY);
         logic = null;
         if (locked = compound.getBoolean(KEY_LOCKED)) {
             logic = MachineLogicRegistry.INSTANCE.getLogic(compound.getString(KEY_LOGIC_NAME));
             if (logic != null) {
-                NBTHelper.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
+                NBTUtils.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
             }
         }
         batteryBehaviour = MachineFrameTile.BatteryBehaviour.get(compound.getInteger(KEY_BATTERY_BEHAVE));

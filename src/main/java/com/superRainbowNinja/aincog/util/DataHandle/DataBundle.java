@@ -10,39 +10,48 @@ import java.util.Map;
 /**
  * Created by SuperRainbowNinja on 24/12/2016.
  */
+
 public class DataBundle<T> {
     private final IFieldHandle<T>[] fields;
-    private final Map<String, IFieldHandle> fieldMap;
+    private final Map<String, IFieldHandle<T>> fieldMap;
 
-    public DataBundle(IFieldHandle ... handles) {
+    public static <X> DataBundle<X> create(IFieldHandle<X> ... handles) {
+        return new DataBundle<X>(handles);
+    }
+
+    /* I found this post to be quite informative about this warning/suppressor
+     * http://stackoverflow.com/questions/12462079/potential-heap-pollution-via-varargs-parameter
+    * */
+    @SafeVarargs
+    private DataBundle(IFieldHandle<T> ... handles) {
         fields = handles;
-        ImmutableMap.Builder<String, IFieldHandle> builder = ImmutableMap.builder();
-        for (IFieldHandle field : fields) {
+        ImmutableMap.Builder<String, IFieldHandle<T>> builder = ImmutableMap.builder();
+        for (IFieldHandle<T> field : fields) {
             builder.put(field.getName(), field);
         }
         fieldMap = builder.build();
     }
 
     public void toBytes(ByteBuf buf, T tile) {
-        for (IFieldHandle field : fields) {
+        for (IFieldHandle<T> field : fields) {
             field.toBytes(buf, tile);
         }
     }
 
     public void fromBytes(ByteBuf buf, T tile) {
-        for (IFieldHandle field : fields) {
+        for (IFieldHandle<T> field : fields) {
             field.fromBytes(buf, tile);
         }
     }
 
     public void writeNBT(NBTTagCompound compound, T tile) {
-        for (IFieldHandle field : fields) {
+        for (IFieldHandle<T> field : fields) {
             field.writeNBT(compound, tile);
         }
     }
 
     public void readNBT(NBTTagCompound compound, T tile) {
-        for (IFieldHandle field : fields) {
+        for (IFieldHandle<T> field : fields) {
             field.readNBT(compound, tile);
         }
     }

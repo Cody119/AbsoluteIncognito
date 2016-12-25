@@ -8,6 +8,10 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
 /**
  * Created by SuperRainbowNinja on 25/12/2016.
  */
@@ -44,6 +48,24 @@ public class BufferUtils {
                 inv.setInventorySlotContents(i, stack);
             }
         }
+    }
+
+    public static final Function<ByteBuf, ExactPosition> posReader = ExactPosition::new;
+
+    public static <T> void writeList(ByteBuf buf, List<T> list, BiConsumer<ByteBuf, T> writer) {
+        buf.writeInt(list.size());
+        for (T element : list) {
+            writer.accept(buf, element);
+        }
+    }
+
+    public static <T> List<T> readList(ByteBuf buf, Function<ByteBuf, T> reader, Function<Integer, List<T>> listConstructor) {
+        int size = buf.readInt();
+        List<T> ret = listConstructor.apply(size);
+        for (int i = 0; i< size; i++) {
+            ret.add(reader.apply(buf));
+        }
+        return ret;
     }
 
     public static void writeFluid(ByteBuf buf, FluidStack stack) {
