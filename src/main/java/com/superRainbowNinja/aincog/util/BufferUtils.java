@@ -31,7 +31,7 @@ public class BufferUtils {
         buf.writeInt(-1);
     }
 
-    public static int readInvLength(ByteBuf buf, IInventory inv) {
+    public static int readInvLength(ByteBuf buf) {
         return buf.readInt();
     }
 
