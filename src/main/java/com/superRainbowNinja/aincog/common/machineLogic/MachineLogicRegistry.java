@@ -2,8 +2,10 @@ package com.superRainbowNinja.aincog.common.machineLogic;
 
 import com.google.common.collect.Maps;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
+import com.superRainbowNinja.aincog.util.NBTUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import java.nio.channels.ByteChannel;
@@ -15,6 +17,10 @@ import java.util.Map;
  */
 public enum MachineLogicRegistry {
     INSTANCE;
+
+    public static final String KEY_LOGIC = "LOGIC";
+    public static final String KEY_LOGIC_NAME = "LOGIC_NAME";
+
     ArrayList<IMachineLogicProvider> logicProviders;
     Map<String, IMachineLogicProvider> providerMap;
 
@@ -62,6 +68,20 @@ public enum MachineLogicRegistry {
             return provider.deserializeLogic(name, buf);
         }
         return null;
+    }
+
+    public NBTTagCompound writeLogic(NBTTagCompound compound, IMachineLogic logic) {
+        compound.setString(KEY_LOGIC_NAME, logic.getName());
+        NBTUtils.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
+        return compound;
+    }
+
+    public IMachineLogic readLogic(NBTTagCompound compound) {
+        IMachineLogic logic = MachineLogicRegistry.INSTANCE.getLogic(compound.getString(KEY_LOGIC_NAME));
+        if (logic != null) {
+            NBTUtils.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
+        }
+        return logic;
     }
 
     public IMachineLogic tryGetLogic(MachineFrameTile m) {

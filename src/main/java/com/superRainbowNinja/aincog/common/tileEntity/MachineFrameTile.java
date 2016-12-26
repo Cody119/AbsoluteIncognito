@@ -12,7 +12,7 @@ import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
 import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.network.*;
 import com.superRainbowNinja.aincog.util.*;
-import com.superRainbowNinja.aincog.util.DataHandle.IntegerHandle;
+import com.superRainbowNinja.aincog.util.DataHandle.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.util.EnumParticleTypes;
@@ -30,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
+import scala.tools.cmd.gen.AnyValReps;
 
 import javax.annotation.Nullable;
 import javax.crypto.Mac;
@@ -735,4 +736,27 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     public int getRfForUpdate() {
         return energy.getEnergyStored();
     }
+
+    //it is unchecked in code but from visual inspection it is quite clear this is fine
+    @SuppressWarnings("unchecked")
+    public static final DataBundle<MachineFrameTile> dataHandle = DataBundle.create(
+            new InvHandle<>(MachineInfo.KEY_INVENTORY, tile -> tile, MachineFrameTile::resizeInv),
+            ListHandle.getInvListHandle(MachineInfo.KEY_COMP_ITEMS, MachineFrameTile::getComponentItems,
+                    (tile, itemStacks) -> tile.componentItems = (ArrayList<ItemStack>) itemStacks),
+            ListHandle.getPosListHandle(MachineInfo.KEY_COMP_POS, MachineFrameTile::getComponentPositions,
+                    ((tile, exactPositions) -> tile.componentPositions = (ArrayList<ExactPosition>) exactPositions)),
+            new ItemStackHandler<>(MachineInfo.KEY_CORE, MachineFrameTile::getCoreStack, MachineFrameTile::setCore),
+            new Instruction<>("UpdateInternals", MachineFrameTile::updateInternals),
+            new IntegerHandle<>(MachineInfo.KEY_ENERGY, (tile) -> tile.energy.getEnergyStored(), (o, integer) -> o.energy.setEnergyStored(integer)),
+            new BooleanHandle<>(MachineInfo.KEY_LOCKED, MachineFrameTile::isLocked, (tile, aBoolean) -> tile.locked = aBoolean),
+            new LogicHandle<>(MachineInfo.KEY_LOGIC, MachineFrameTile::getLogic, (tile, logic1) -> tile.logic = tile.locked ? logic1 : null),
+            new EnumHandler<>(MachineInfo.KEY_BATTERY_BEHAVE, MachineFrameTile::getBatteryBehaviour,
+                    MachineFrameTile::setBatteryBehaviour, BatteryBehaviour.values()),
+            new EnumHandler<>(MachineInfo.KEY_CUR_OP, MachineFrameTile::getCurOp,
+                    (tile, operation) -> tile.curOp = operation != null ? operation : Operation.NOP, Operation.values()),
+            //TODO this only really needs to exsist client side, maybe make it finish at pos 0? then it dosent need 2 be synced
+            //new IntegerHandle<>(MachineInfo.KEY_CORE_ANGLE, MachineFrameTile::getCoreAngle, (tile, integer) -> {if (integer != -1) tile.coreAngle = integer;})
+            //TODO core speed
+            new Instruction<>("PostDeserialize", (tile) -> {if (tile.locked) tile.logic.postDeserialize(tile);})
+    );
 }
