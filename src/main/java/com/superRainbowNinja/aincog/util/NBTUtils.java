@@ -45,40 +45,6 @@ public final class NBTUtils {
         return itemStack.getTagCompound().getInteger(key);
     }
 
-    public static <T> void writeArray(T[] inv, NBTTagCompound compound, String saveName, Function<T, NBTBase> tagMaker) {
-        compound.setInteger(saveName + ":Length", inv.length);
-        NBTTagList nbttaglist = new NBTTagList();
-        for (int i = 0; i < inv.length; ++i)
-        {
-            if (inv[i] != null)
-            {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte)i);
-                nbttagcompound.setTag("Content", tagMaker.apply(inv[i]));
-                nbttaglist.appendTag(nbttagcompound);
-            }
-        }
-        compound.setTag(saveName, nbttaglist);
-    }
-
-    public static <T> T[] readArray(NBTTagCompound compound, String loadName, Function<NBTBase, T> tagReader, int tagNumber, Function<Integer, T[]> arrayMaker) {
-        NBTTagList nbttaglist = compound.getTagList(loadName, tagNumber);
-        T ret[] = arrayMaker.apply(compound.getInteger(loadName + ":Length"));
-
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound.getByte("Slot");
-
-            if (j >= 0 && j < ret.length)
-            {
-                ret[j] = tagReader.apply(nbttagcompound.getCompoundTag("Content"));
-            }
-        }
-
-        return ret;
-    }
-
     public static void writeObject(NBTTagCompound compound, String key, Consumer<NBTTagCompound> writer) {
         NBTTagCompound newTag = new NBTTagCompound();
         writer.accept(newTag);
@@ -108,6 +74,37 @@ public final class NBTUtils {
         return ret;
     }
 
+    public static <T> void writeArray(T[] inv, NBTTagCompound compound, String saveName, Function<T, NBTBase> tagMaker) {
+        compound.setInteger(saveName + ":Length", inv.length);
+        NBTTagList nbttaglist = new NBTTagList();
+        for (int i = 0; i < inv.length; ++i) {
+            if (inv[i] != null) {
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte)i);
+                nbttagcompound.setTag("Content", tagMaker.apply(inv[i]));
+                nbttaglist.appendTag(nbttagcompound);
+            }
+        }
+        compound.setTag(saveName, nbttaglist);
+    }
+
+    public static <T> T[] readArray(NBTTagCompound compound, String loadName, Function<NBTBase, T> tagReader, int tagNumber) {//, Function<Integer, T[]> arrayMaker) {
+        NBTTagList nbttaglist = compound.getTagList(loadName, tagNumber);
+
+        T[] ret = (T[])new Object[compound.getInteger(loadName + ":Length")];//arrayMaker.apply(compound.getInteger(loadName + ":Length"));
+
+        for (int i = 0; i < nbttaglist.tagCount(); ++i) {
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            int j = nbttagcompound.getByte("Slot");
+
+            if (j >= 0 && j < ret.length) {
+                ret[j] = tagReader.apply(nbttagcompound.getCompoundTag("Content"));
+            }
+        }
+        return ret;
+    }
+
+    //These 2 methods should mirror writeArray so they may be used interchangably
     public static void writeInventory(IInventory inv, NBTTagCompound compound, String saveName) {
         int size = inv.getSizeInventory();
         compound.setInteger(saveName + ":length", size);
@@ -149,7 +146,7 @@ public final class NBTUtils {
 
 
     public static ItemStack[] readInventoryArray(NBTTagCompound compound, String loadName) {
-        return NBTUtils.<ItemStack>readArray(compound, loadName, getItemStack, TAG_COMPOUND, ItemStack[]::new);
+        return NBTUtils.<ItemStack>readArray(compound, loadName, getItemStack, TAG_COMPOUND);
     }
 
     public static void writeInventoryArray(ItemStack[] inv, NBTTagCompound compound, String saveName) {

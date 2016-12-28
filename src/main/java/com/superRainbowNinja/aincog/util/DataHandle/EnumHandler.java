@@ -28,22 +28,22 @@ public class EnumHandler<T, R extends Enum<R>> extends FieldHandleImp<T, R> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         compound.setInteger(name, get(getter.apply(object)));
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, get(compound.getInteger(name)));
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         buf.writeInt(get(getter.apply(object)));
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, get(buf.readInt()));
+    R readObject(NBTTagCompound compound) {
+        return get(compound.getInteger(name));
+    }
+
+    @Override
+    R readObject(ByteBuf buf) {
+        return get(buf.readInt());
     }
 }

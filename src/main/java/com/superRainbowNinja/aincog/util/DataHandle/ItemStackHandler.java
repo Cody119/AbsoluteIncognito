@@ -18,22 +18,22 @@ public class ItemStackHandler<T> extends FieldHandleImp<T, ItemStack> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         compound.setTag(name, getter.apply(object).writeToNBT(new NBTTagCompound()));
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, ItemStack.loadItemStackFromNBT(compound.getCompoundTag(name)));
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         ByteBufUtils.writeItemStack(buf, getter.apply(object));
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, ByteBufUtils.readItemStack(buf));
+    ItemStack readObject(NBTTagCompound compound) {
+        return ItemStack.loadItemStackFromNBT(compound.getCompoundTag(name));
+    }
+
+    @Override
+    ItemStack readObject(ByteBuf buf) {
+        return  ByteBufUtils.readItemStack(buf);
     }
 }

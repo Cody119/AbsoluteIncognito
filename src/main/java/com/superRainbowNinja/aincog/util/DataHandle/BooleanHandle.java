@@ -15,22 +15,22 @@ public class BooleanHandle<T> extends FieldHandleImp<T, Boolean> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         compound.setBoolean(name, getter.apply(object));
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, compound.getBoolean(name));
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         buf.writeBoolean(getter.apply(object));
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, buf.readBoolean());
+    Boolean readObject(NBTTagCompound compound) {
+        return compound.getBoolean(name);
+    }
+
+    @Override
+    Boolean readObject(ByteBuf buf) {
+        return buf.readBoolean();
     }
 }

@@ -19,22 +19,23 @@ public class LogicHandle<T> extends FieldHandleImp<T, IMachineLogic> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         compound.setTag(name, MachineLogicRegistry.INSTANCE.writeLogic(new NBTTagCompound(), getter.apply(object)));
     }
 
-    @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, MachineLogicRegistry.INSTANCE.readLogic(compound));
-    }
 
     @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         MachineLogicRegistry.serializeLogic(getter.apply(object), buf);
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, MachineLogicRegistry.INSTANCE.deserializeLogic(buf));
+    IMachineLogic readObject(NBTTagCompound compound) {
+        return MachineLogicRegistry.INSTANCE.readLogic(compound);
+    }
+
+    @Override
+    IMachineLogic readObject(ByteBuf buf) {
+        return MachineLogicRegistry.INSTANCE.deserializeLogic(buf);
     }
 }

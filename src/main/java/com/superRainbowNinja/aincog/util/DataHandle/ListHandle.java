@@ -56,22 +56,22 @@ public class ListHandle<T, R> extends FieldHandleImp<T,List<R>> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         NBTUtils.writeList(getter.apply(object), compound, name, tagMaker);
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, NBTUtils.readList(compound, name, tagReader, tagId, listConstructor));
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         BufferUtils.writeList(buf, getter.apply(object), writer);
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, BufferUtils.readList(buf, reader, listConstructor));
+    List<R> readObject(NBTTagCompound compound) {
+        return NBTUtils.readList(compound, name, tagReader, tagId, listConstructor);
+    }
+
+    @Override
+    List<R> readObject(ByteBuf buf) {
+        return  BufferUtils.readList(buf, reader, listConstructor);
     }
 }

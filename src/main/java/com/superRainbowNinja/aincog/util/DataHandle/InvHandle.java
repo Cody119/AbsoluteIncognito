@@ -1,5 +1,6 @@
 package com.superRainbowNinja.aincog.util.DataHandle;
 
+import com.mojang.realmsclient.util.Pair;
 import com.superRainbowNinja.aincog.util.BufferUtils;
 import com.superRainbowNinja.aincog.util.NBTUtils;
 import io.netty.buffer.ByteBuf;
@@ -34,12 +35,12 @@ public class InvHandle<T> implements IFieldHandle<T> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         NBTUtils.writeInventory(getter.apply(object), compound, name);
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
+    public void read(NBTTagCompound compound, T object) {
         if (sizeHandle != null) {
             sizeHandle.accept(object, NBTUtils.readInvLength(compound, name));
         }
@@ -47,16 +48,31 @@ public class InvHandle<T> implements IFieldHandle<T> {
     }
 
     @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public Object read(NBTTagCompound tag) {
+        return Pair.of(NBTUtils.readInvLength(tag, name), NBTUtils.readInventory(getter.apply(object), tag, name));
+    }
+
+    @Override
+    public void write(ByteBuf buf, T object) {
         BufferUtils.writeInventory(buf, getter.apply(object), sizeHandle != null);
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
+    public void read(ByteBuf buf, T object) {
         IInventory inv = getter.apply(object);
         if (sizeHandle != null) {
             sizeHandle.accept(object, BufferUtils.readInvLength(buf));
         }
         BufferUtils.readInvItems(buf, inv);
+    }
+
+    @Override
+    public Object read(ByteBuf buf) {
+        return null;
+    }
+
+    @Override
+    public void readFromCache(Object data, T object) {
+
     }
 }

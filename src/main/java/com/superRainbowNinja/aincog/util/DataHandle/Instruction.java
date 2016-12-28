@@ -25,18 +25,33 @@ public class Instruction<T> implements IFieldHandle<T> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {}
+    public void write(NBTTagCompound compound, T object) {}
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
+    public void read(NBTTagCompound compound, T object) {
         func.accept(object);
     }
 
     @Override
-    public void toBytes(ByteBuf buf, T object) {}
+    public Object read(NBTTagCompound tag) {
+        return null;
+    }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {}
+
+    @Override
+    public void read(ByteBuf buf, T object) {
+        func.accept(object);
+    }
+
+    @Override
+    public Object read(ByteBuf buf) {
+        return null;
+    }
+
+    @Override
+    public void readFromCache(Object data, T object) {
         func.accept(object);
     }
 }

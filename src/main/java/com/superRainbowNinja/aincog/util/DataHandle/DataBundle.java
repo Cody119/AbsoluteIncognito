@@ -34,25 +34,25 @@ public class DataBundle<T> {
 
     public void toBytes(ByteBuf buf, T tile) {
         for (IFieldHandle<T> field : fields) {
-            field.toBytes(buf, tile);
+            field.write(buf, tile);
         }
     }
 
     public void fromBytes(ByteBuf buf, T tile) {
         for (IFieldHandle<T> field : fields) {
-            field.fromBytes(buf, tile);
+            field.read(buf, tile);
         }
     }
 
     public void writeNBT(NBTTagCompound compound, T tile) {
         for (IFieldHandle<T> field : fields) {
-            field.writeNBT(compound, tile);
+            field.write(compound, tile);
         }
     }
 
     public void readNBT(NBTTagCompound compound, T tile) {
         for (IFieldHandle<T> field : fields) {
-            field.readNBT(compound, tile);
+            field.read(compound, tile);
         }
     }
 

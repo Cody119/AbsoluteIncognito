@@ -16,22 +16,22 @@ public class IntegerHandle<T> extends FieldHandleImp<T, Integer> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         compound.setInteger(name, getter.apply(object));
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, compound.getInteger(name));
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         buf.writeInt(getter.apply(object));
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, buf.readInt());
+    Integer readObject(NBTTagCompound compound) {
+        return compound.getInteger(name);
+    }
+
+    @Override
+    Integer readObject(ByteBuf buf) {
+        return buf.readInt();
     }
 }

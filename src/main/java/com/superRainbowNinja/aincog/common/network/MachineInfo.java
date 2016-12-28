@@ -1,5 +1,6 @@
 package com.superRainbowNinja.aincog.common.network;
 
+import com.superRainbowNinja.aincog.common.blocks.MachineFrame;
 import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
 import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
@@ -52,14 +53,20 @@ public class MachineInfo {
     public int coreSpeed;
     public long curTime;
 
-    public MachineInfo(ByteBuf buf) {
+    private MachineFrameTile tile;
+
+    public MachineInfo(ByteBuf buf, MachineFrameTile tile) {
+        this(tile);
         fromBytes(buf);
         curTime = 0;
     };
 
-    public MachineInfo() {}
+    public MachineInfo(MachineFrameTile tileIn) {
+        tile = tileIn;
+    }
 
-    public MachineInfo(NBTTagCompound compound) {
+    public MachineInfo(NBTTagCompound compound, MachineFrameTile tile) {
+        this(tile);
         readNBT(compound);
     }
 
@@ -106,6 +113,7 @@ public class MachineInfo {
     }
 
     public void fromBytes(ByteBuf buf) {
+        /*
         int len = buf.readInt();
         compItems = new ArrayList<>(8);
         compPos = new ArrayList<>(8);
@@ -137,15 +145,18 @@ public class MachineInfo {
         coreAngle = buf.readInt();
         coreSpeed = buf.readInt();
         curTime = buf.readLong();
+        */
+        MachineFrameTile.dataHandle.fromBytes(buf, tile);
     }
 
     public void toBytes(ByteBuf buf) {
+        /*
         buf.writeInt(compItems.size());
         for (ItemStack item : compItems) {
             ByteBufUtils.writeItemStack(buf, item);
         }
         for (ExactPosition pos : compPos) {
-            pos.toBytes(buf);
+            pos.write(buf);
         }
         buf.writeInt(inv.length);
         for (int i = 0; i < inv.length; i++) {
@@ -172,9 +183,12 @@ public class MachineInfo {
         if (core == null && curOp != Operation.NOP) {
             System.out.println("sent invalid state");
         }
+        */
+        MachineFrameTile.dataHandle.toBytes(buf, tile);
     }
 
     public NBTTagCompound writeNBT(NBTTagCompound compound) {
+        /*
         NBTUtils.writeInventoryArray(inv, compound, KEY_INVENTORY);
         NBTUtils.writeInventory(compItems, compound, KEY_COMP_ITEMS);
         NBTUtils.writePositions(compPos, compound, KEY_COMP_POS);
@@ -194,10 +208,13 @@ public class MachineInfo {
         compound.setInteger(KEY_CUR_OP, curOp.ordinal());
         compound.setInteger(KEY_CORE_ANGLE, coreAngle);
         compound.setInteger(KEY_CORE_SPEED, coreSpeed);
+        */
+        MachineFrameTile.dataHandle.writeNBT(compound, tile);
         return compound;
     }
 
     public void readNBT(NBTTagCompound compound) {
+        /*
         inv = NBTUtils.readInventoryArray(compound, KEY_INVENTORY);
         compItems = NBTUtils.readInventory(compound, KEY_COMP_ITEMS);
         compPos = NBTUtils.readPositions(compound, KEY_COMP_POS);
@@ -215,5 +232,7 @@ public class MachineInfo {
         core = ItemStack.loadItemStackFromNBT(compound.getCompoundTag(KEY_CORE));
         coreAngle = compound.getInteger(KEY_CORE_ANGLE);
         coreSpeed = compound.getInteger(KEY_CORE_SPEED);
+        */
+        MachineFrameTile.dataHandle.readNBT(compound, tile);
     }
 }

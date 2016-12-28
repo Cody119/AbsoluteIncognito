@@ -18,22 +18,22 @@ public class ExactPositionHandle<T> extends FieldHandleImp<T, ExactPosition> {
     }
 
     @Override
-    public void writeNBT(NBTTagCompound compound, T object) {
+    public void write(NBTTagCompound compound, T object) {
         compound.setTag(name, getter.apply(object).getTag(new NBTTagCompound()));
     }
 
     @Override
-    public void readNBT(NBTTagCompound compound, T object) {
-        setter.accept(object, new ExactPosition(compound));
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf, T object) {
+    public void write(ByteBuf buf, T object) {
         getter.apply(object).toBytes(buf);
     }
 
     @Override
-    public void fromBytes(ByteBuf buf, T object) {
-        setter.accept(object, new ExactPosition(buf));
+    ExactPosition readObject(NBTTagCompound compound) {
+        return new ExactPosition(compound);
+    }
+
+    @Override
+    ExactPosition readObject(ByteBuf buf) {
+        return new ExactPosition(buf);
     }
 }

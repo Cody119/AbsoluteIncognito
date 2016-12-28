@@ -444,7 +444,8 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     ----------------------------*/
     @Override
     public MachineInfo getMachineInfo() {
-        MachineInfo info = new MachineInfo();
+        MachineInfo info = new MachineInfo(this);
+        /*
         info.addInv(inv);
         info.addComponents(componentItems, componentPositions);
         info.addCore(coreStack);
@@ -455,11 +456,13 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         info.addCoreAngle(coreAngle);
         info.addCoreSpeed(coreSpeed);
         info.addCurrentTime(worldObj.getTotalWorldTime());
+        */
         return info;
     }
 
     @Override
     public void updateMachine(MachineInfo info) {
+        /*
         inv = info.inv;
         componentItems = new ArrayList<>(8);
         componentItems.addAll(info.compItems);
@@ -516,6 +519,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         if (locked) {
             logic.postDeserialize(this);
         }
+        */
     }
 
     @Override
@@ -559,7 +563,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        updateMachine(new MachineInfo(compound));
+        new MachineInfo(compound, this);
         super.readFromNBT(compound);
     }
 

@@ -43,7 +43,7 @@ public class BlockRenderUpdater extends TileEntityPacket {
     @Override
     public void fromBytes(ByteBuf buf) {
         super.fromBytes(buf);
-        info = new MachineInfo(buf);
+        info = new MachineInfo();
     }
 
     @Override
