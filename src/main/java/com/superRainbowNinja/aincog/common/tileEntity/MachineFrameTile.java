@@ -563,7 +563,8 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        new MachineInfo(compound, this);
+        dataHandle.read(compound, this);
+
         super.readFromNBT(compound);
     }
 

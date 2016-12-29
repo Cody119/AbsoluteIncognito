@@ -1,6 +1,7 @@
 package com.superRainbowNinja.aincog.common.network;
 
 import com.superRainbowNinja.aincog.common.tileEntity.IMachineInfoProvider;
+import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
 import com.superRainbowNinja.aincog.util.LogHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -43,7 +44,7 @@ public class BlockRenderUpdater extends TileEntityPacket {
     @Override
     public void fromBytes(ByteBuf buf) {
         super.fromBytes(buf);
-        info = new MachineInfo();
+        info = new MachineInfo(buf);
     }
 
     @Override
@@ -69,7 +70,8 @@ public class BlockRenderUpdater extends TileEntityPacket {
             mc.addScheduledTask(() -> {
                 TileEntity te = mc.theWorld.getTileEntity(message.getPos());
                 if (te instanceof IMachineInfoProvider) {
-                    ((IMachineInfoProvider) te).updateMachine(message.getInfo());
+                    //((IMachineInfoProvider) te).updateMachine(message.getInfo());
+                    MachineFrameTile.dataHandle.readFromCache(message.getInfo().data, ((MachineFrameTile) te));
                 } else {
                     LogHelper.errorLog("Server sent AI render info at " + message.pos + " but no AI tile entity exists");
                 }

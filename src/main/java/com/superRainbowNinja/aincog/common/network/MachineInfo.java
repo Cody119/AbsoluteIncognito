@@ -37,7 +37,7 @@ public class MachineInfo {
 
     static final ArrayList EMPTY_LIST = new ArrayList(0);
     public static final ItemStack[] EMPTY_ITEM_STACKS = new ItemStack[0];
-
+/*
     //give everything defualt values as it is a capability
     public ItemStack[] inv;
     public ArrayList<ItemStack> compItems;
@@ -52,65 +52,22 @@ public class MachineInfo {
     public int coreAngle;
     public int coreSpeed;
     public long curTime;
-
+*/
     private MachineFrameTile tile;
+    public Object data;
 
-    public MachineInfo(ByteBuf buf, MachineFrameTile tile) {
-        this(tile);
+    public MachineInfo(ByteBuf buf) {
         fromBytes(buf);
-        curTime = 0;
     };
 
     public MachineInfo(MachineFrameTile tileIn) {
         tile = tileIn;
     }
 
-    public MachineInfo(NBTTagCompound compound, MachineFrameTile tile) {
-        this(tile);
+    public MachineInfo(NBTTagCompound compound) {
         readNBT(compound);
     }
 
-    public void addInv(ItemStack[] invIn) {
-        inv = invIn;
-    }
-
-    public void addComponents(ArrayList<ItemStack> items, ArrayList<ExactPosition> positions) {
-        compItems = items;
-        compPos = positions;
-    }
-
-    public void addEnergy(int energyIn) {
-        energy = energyIn;
-    }
-
-    public void addLogic(@Nullable IMachineLogic logicIn) {
-        logic = logicIn;
-        locked = logicIn != null;
-    }
-
-    public void addCore(ItemStack stackIn) {
-        core = stackIn;
-    }
-
-    public void addBatteryBehaviour(MachineFrameTile.BatteryBehaviour b) {
-        batteryBehaviour = b;
-    }
-
-    public void addCurrentOperation(Operation op) {
-        curOp = op;
-    }
-
-    public void addCurrentTime(long time) {
-        curTime = time;
-    }
-
-    public void addCoreAngle(int angle) {
-        coreAngle = angle;
-    }
-
-    public void addCoreSpeed(int speed) {
-        coreSpeed = speed;
-    }
 
     public void fromBytes(ByteBuf buf) {
         /*
@@ -146,7 +103,7 @@ public class MachineInfo {
         coreSpeed = buf.readInt();
         curTime = buf.readLong();
         */
-        MachineFrameTile.dataHandle.fromBytes(buf, tile);
+        data = MachineFrameTile.dataHandle.read(buf);
     }
 
     public void toBytes(ByteBuf buf) {
@@ -184,7 +141,7 @@ public class MachineInfo {
             System.out.println("sent invalid state");
         }
         */
-        MachineFrameTile.dataHandle.toBytes(buf, tile);
+        MachineFrameTile.dataHandle.write(buf, tile);
     }
 
     public NBTTagCompound writeNBT(NBTTagCompound compound) {
@@ -209,7 +166,7 @@ public class MachineInfo {
         compound.setInteger(KEY_CORE_ANGLE, coreAngle);
         compound.setInteger(KEY_CORE_SPEED, coreSpeed);
         */
-        MachineFrameTile.dataHandle.writeNBT(compound, tile);
+        MachineFrameTile.dataHandle.write(compound, tile);
         return compound;
     }
 
@@ -233,6 +190,6 @@ public class MachineInfo {
         coreAngle = compound.getInteger(KEY_CORE_ANGLE);
         coreSpeed = compound.getInteger(KEY_CORE_SPEED);
         */
-        MachineFrameTile.dataHandle.readNBT(compound, tile);
+        data = MachineFrameTile.dataHandle.read(compound);
     }
 }
