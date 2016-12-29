@@ -393,7 +393,10 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         //World server cast as the method we use is not in World (this is important and confusing)
         WorldServer server = ((WorldServer) worldIn);
         //server.spawnParticle(EnumParticleTypes.REDSTONE, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 10, 0.1, 0.1, 0.1, 0.0D);//, Item.getIdFromItem(AIncogData.MAKESHIFT_CORE));
-        server.spawnParticle(EnumParticleTypes.ITEM_CRACK, pos.getX()+0.5, pos.getY()+0.95, pos.getZ()+0.5, 15, 0.1, 0.0, 0.1, 0.1, Item.getIdFromItem(coreStack.getItem()));
+
+        //passing 1 argument 2 this will crash, it it allowed on the client side but the packets sent by the server do not determin argument count, the enum does
+        //and ITEM_CRACK has 2 arguments
+        server.spawnParticle(EnumParticleTypes.ITEM_CRACK, pos.getX()+0.5, pos.getY()+0.95, pos.getZ()+0.5, 15, 0.1, 0.0, 0.1, 0.1, Item.getIdFromItem(coreStack.getItem()), 0);
     }
 
     //does not drop the inventory
