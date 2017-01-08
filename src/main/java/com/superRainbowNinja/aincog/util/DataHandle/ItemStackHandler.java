@@ -10,6 +10,8 @@ import java.util.function.Function;
 
 /**
  * Created by SuperRainbowNinja on 23/12/2016.
+ *
+ * TODO handle null
  */
 
 public class ItemStackHandler<T> extends FieldHandleImp<T, ItemStack> {

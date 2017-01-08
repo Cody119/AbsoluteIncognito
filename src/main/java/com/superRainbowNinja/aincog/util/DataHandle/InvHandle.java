@@ -5,6 +5,7 @@ import com.superRainbowNinja.aincog.util.BufferUtils;
 import com.superRainbowNinja.aincog.util.NBTUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.function.BiConsumer;
@@ -49,7 +50,8 @@ public class InvHandle<T> implements IFieldHandle<T> {
 
     @Override
     public Object read(NBTTagCompound tag) {
-        return Pair.of(NBTUtils.readInvLength(tag, name), NBTUtils.readInventory(getter.apply(object), tag, name));
+        //return Pair.of(NBTUtils.readInvLength(tag, name), NBTUtils.readInventory(getter.apply(object), tag, name));
+        return NBTUtils.readInventoryArray(tag, name);
     }
 
     @Override
@@ -68,11 +70,18 @@ public class InvHandle<T> implements IFieldHandle<T> {
 
     @Override
     public Object read(ByteBuf buf) {
-        return null;
+        return BufferUtils.readInvItems(buf);
     }
 
     @Override
     public void readFromCache(Object data, T object) {
-
+        ItemStack[] inv = (ItemStack[])data;
+        IInventory invMain = getter.apply(object);
+        if (sizeHandle != null) {
+            sizeHandle.accept(object, inv.length);
+        }
+        for (int i = 0; i < inv.length; i++) {
+            invMain.setInventorySlotContents(i, inv[i]);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.superRainbowNinja.aincog.common.capabilites;
 
+import com.superRainbowNinja.aincog.util.BufferUtils;
 import com.superRainbowNinja.aincog.util.NBTUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
@@ -58,12 +59,12 @@ public class LockableTankImp extends FluidTank implements ILockableTank, ICapabi
 
     public void serialize(ByteBuf buf) {
         buf.writeInt(lockState.ordinal());
-        NBTUtils.writeFluid(buf, getFluid());
+        BufferUtils.writeFluid(buf, getFluid());
     }
 
     public void deserialize(ByteBuf buf) {
         lockState = OutputState.values()[buf.readInt()];
-        setFluid(NBTUtils.readFluid(buf));
+        setFluid(BufferUtils.readFluid(buf));
     }
 
     @Override

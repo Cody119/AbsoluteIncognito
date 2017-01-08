@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 /**
  * Created by SuperRainbowNinja on 26/12/2016.
+ * TODO handle null
  */
 public class LogicHandle<T> extends FieldHandleImp<T, IMachineLogic> {
     public LogicHandle(String nameIn, Function<T, IMachineLogic> getterIn, BiConsumer<T, IMachineLogic> setterIn) {

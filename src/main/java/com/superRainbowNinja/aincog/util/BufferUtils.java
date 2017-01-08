@@ -50,6 +50,18 @@ public class BufferUtils {
         }
     }
 
+    public static ItemStack[] readInvItems(ByteBuf buf) {
+        ItemStack[] inv = new ItemStack[readInvLength(buf)];
+        int i;
+        while ((i = buf.readInt()) != -1) {
+            ItemStack stack = ByteBufUtils.readItemStack(buf);
+            if (i >= 0 && i < inv.length) {
+                inv[i] = stack;
+            }
+        }
+        return inv;
+    }
+
     public static final Function<ByteBuf, ExactPosition> posReader = ExactPosition::new;
 
     public static <T> void writeList(ByteBuf buf, List<T> list, BiConsumer<ByteBuf, T> writer) {

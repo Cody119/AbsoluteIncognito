@@ -88,10 +88,10 @@ public final class NBTUtils {
         compound.setTag(saveName, nbttaglist);
     }
 
-    public static <T> T[] readArray(NBTTagCompound compound, String loadName, Function<NBTBase, T> tagReader, int tagNumber) {//, Function<Integer, T[]> arrayMaker) {
+    public static <T> T[] readArray(NBTTagCompound compound, String loadName, Function<NBTBase, T> tagReader, int tagNumber, Function<Integer, T[]> arrayMaker) {
         NBTTagList nbttaglist = compound.getTagList(loadName, tagNumber);
 
-        T[] ret = (T[])new Object[compound.getInteger(loadName + ":Length")];//arrayMaker.apply(compound.getInteger(loadName + ":Length"));
+        T[] ret = arrayMaker.apply(compound.getInteger(loadName + ":Length"));
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i) {
             NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
@@ -146,7 +146,7 @@ public final class NBTUtils {
 
 
     public static ItemStack[] readInventoryArray(NBTTagCompound compound, String loadName) {
-        return NBTUtils.<ItemStack>readArray(compound, loadName, getItemStack, TAG_COMPOUND);
+        return NBTUtils.<ItemStack>readArray(compound, loadName, getItemStack, TAG_COMPOUND, ItemStack[]::new);
     }
 
     public static void writeInventoryArray(ItemStack[] inv, NBTTagCompound compound, String saveName) {
