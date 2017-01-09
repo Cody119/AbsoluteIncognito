@@ -1,6 +1,6 @@
 package com.superRainbowNinja.aincog.common.network;
 
-import com.superRainbowNinja.aincog.common.tileEntity.IMachineInfoProvider;
+import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
 import com.superRainbowNinja.aincog.util.LogHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -67,8 +67,8 @@ public class ClientRenderRequest extends TileEntityPacket {
             final WorldServer playerWorldServer = sendingPlayer.getServerWorld();
             playerWorldServer.addScheduledTask(() -> {
                 TileEntity te = playerWorldServer.getTileEntity(message.pos);
-                if (te instanceof IMachineInfoProvider) {
-                    PacketHandler.sendTo(sendingPlayer, new BlockRenderUpdater(((IMachineInfoProvider) te).getMachineInfo(), te.getPos()));
+                if (te instanceof MachineFrameTile) {
+                    PacketHandler.sendTo(sendingPlayer, new BlockRenderUpdater(((MachineFrameTile) te)));
                 } else {
                     LogHelper.errorLog("Player requested AI render info at " + message.pos + " but no AI tile entity exists");
                 }

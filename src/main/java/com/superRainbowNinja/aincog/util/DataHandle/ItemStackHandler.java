@@ -11,7 +11,6 @@ import java.util.function.Function;
 /**
  * Created by SuperRainbowNinja on 23/12/2016.
  *
- * TODO handle null
  */
 
 public class ItemStackHandler<T> extends FieldHandleImp<T, ItemStack> {
@@ -21,7 +20,9 @@ public class ItemStackHandler<T> extends FieldHandleImp<T, ItemStack> {
 
     @Override
     public void write(NBTTagCompound compound, T object) {
-        compound.setTag(name, getter.apply(object).writeToNBT(new NBTTagCompound()));
+        ItemStack stack = getter.apply(object);
+        if (stack != null)
+            compound.setTag(name, stack.writeToNBT(new NBTTagCompound()));
     }
 
     @Override

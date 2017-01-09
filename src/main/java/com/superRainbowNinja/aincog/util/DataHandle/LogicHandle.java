@@ -12,7 +12,6 @@ import java.util.function.Function;
 
 /**
  * Created by SuperRainbowNinja on 26/12/2016.
- * TODO handle null
  */
 public class LogicHandle<T> extends FieldHandleImp<T, IMachineLogic> {
     public LogicHandle(String nameIn, Function<T, IMachineLogic> getterIn, BiConsumer<T, IMachineLogic> setterIn) {
@@ -21,7 +20,7 @@ public class LogicHandle<T> extends FieldHandleImp<T, IMachineLogic> {
 
     @Override
     public void write(NBTTagCompound compound, T object) {
-        compound.setTag(name, MachineLogicRegistry.INSTANCE.writeLogic(new NBTTagCompound(), getter.apply(object)));
+        compound.setTag(name, MachineLogicRegistry.writeLogic(new NBTTagCompound(), getter.apply(object)));
     }
 
 
@@ -32,7 +31,7 @@ public class LogicHandle<T> extends FieldHandleImp<T, IMachineLogic> {
 
     @Override
     IMachineLogic readObject(NBTTagCompound compound) {
-        return MachineLogicRegistry.INSTANCE.readLogic(compound);
+        return MachineLogicRegistry.INSTANCE.readLogic(compound.getCompoundTag(name));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.superRainbowNinja.aincog.common.network;
 
-import com.superRainbowNinja.aincog.common.tileEntity.IMachineInfoProvider;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
 import com.superRainbowNinja.aincog.util.LogHelper;
 import io.netty.buffer.ByteBuf;
@@ -17,24 +16,27 @@ import net.minecraftforge.fml.relauncher.Side;
  *
  * Packet sent to the client to update
  * Should only have commmon code
+ * TODO make more generic, dont make it store tile entity?
  */
 public class BlockRenderUpdater extends TileEntityPacket {
 
-    public MachineInfo getInfo() {
-        return info;
+    public Object[] getData() {
+        return data;
     }
 
-    private MachineInfo info;
+    private Object[] data;
+    private MachineFrameTile tile;
 
     public BlockPos getPos() {
         return pos;
     }
 
 
-    public BlockRenderUpdater(MachineInfo infoIn, BlockPos posIn) {
-        super(posIn);
-        info = infoIn;
+    public BlockRenderUpdater(MachineFrameTile tileIn) {
+        super(tileIn.getPos());
+        data = null;
         valid = true;
+        tile = tileIn;
     }
     //used by mc forge on the receiving end of the msg
     public BlockRenderUpdater() {
@@ -44,13 +46,13 @@ public class BlockRenderUpdater extends TileEntityPacket {
     @Override
     public void fromBytes(ByteBuf buf) {
         super.fromBytes(buf);
-        info = new MachineInfo(buf);
+        data = (Object[])MachineFrameTile.dataHandle.read(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         super.toBytes(buf);
-        info.toBytes(buf);
+        MachineFrameTile.dataHandle.write(buf, tile);
     }
 
     public static class Handle implements IMessageHandler<BlockRenderUpdater, IMessage>{
@@ -69,11 +71,11 @@ public class BlockRenderUpdater extends TileEntityPacket {
             final Minecraft mc = Minecraft.getMinecraft();
             mc.addScheduledTask(() -> {
                 TileEntity te = mc.theWorld.getTileEntity(message.getPos());
-                if (te instanceof IMachineInfoProvider) {
-                    //((IMachineInfoProvider) te).updateMachine(message.getInfo());
-                    MachineFrameTile.dataHandle.readFromCache(message.getInfo().data, ((MachineFrameTile) te));
+                if (te instanceof MachineFrameTile) {
+                    //((IMachineInfoProvider) te).updateMachine(message.getData());
+                    MachineFrameTile.dataHandle.readFromCache(message.getData(), ((MachineFrameTile) te));
                 } else {
-                    LogHelper.errorLog("Server sent AI render info at " + message.pos + " but no AI tile entity exists");
+                    LogHelper.errorLog("Server sent AI render data at " + message.pos + " but no AI tile entity exists");
                 }
             });
             return null;

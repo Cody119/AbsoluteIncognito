@@ -45,7 +45,7 @@ import java.util.function.Function;
  * TODO core chat channel
  * TODO maybe make componets render slightly closer (on y-axis) when theres only 2 layers?
  */
-public class MachineFrameTile extends TileEntity implements ITickable, ISidedInventory, IMachineInfoProvider, IEnergyHandler, IEnergyProvider, IEnergyReceiver, IRfUpdater {
+public class MachineFrameTile extends TileEntity implements ITickable, ISidedInventory, IEnergyHandler, IEnergyProvider, IEnergyReceiver, IRfUpdater {
     private static final int MAX_RF_SEND = 100;
     //core spinning
     private static final int ACCELERATION = 1;
@@ -442,85 +442,6 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     /*---------------------------
     |  Override Methods          |
     ----------------------------*/
-    @Override
-    public MachineInfo getMachineInfo() {
-        MachineInfo info = new MachineInfo(this);
-        /*
-        info.addInv(inv);
-        info.addComponents(componentItems, componentPositions);
-        info.addCore(coreStack);
-        info.addEnergy(energy.getEnergyStored());
-        info.addLogic(locked ? logic : null);
-        info.addBatteryBehaviour(batteryBehaviour);
-        info.addCurrentOperation(curOp);
-        info.addCoreAngle(coreAngle);
-        info.addCoreSpeed(coreSpeed);
-        info.addCurrentTime(worldObj.getTotalWorldTime());
-        */
-        return info;
-    }
-
-    @Override
-    public void updateMachine(MachineInfo info) {
-        /*
-        inv = info.inv;
-        componentItems = new ArrayList<>(8);
-        componentItems.addAll(info.compItems);
-
-        componentPositions = new ArrayList<>(8);
-        componentPositions.addAll(info.compPos);
-
-        if (componentPositions.size() == componentItems.size()) {
-            int i = 0;
-            while (i < componentItems.size()) {
-                if (componentItems.get(i) == null || componentPositions.get(i) == null) {
-
-                    LogHelper.errorLog("Error, found null entries in components at index: " + i);
-                    LogHelper.errorLog(componentItems.get(i) + " and " + componentPositions.get(i));
-                    LogHelper.errorLog("TE at " + LogHelper.getPosString(getPos()));
-                    componentPositions.remove(i);
-                    componentItems.remove(i);
-                    continue;
-                }
-                i++;
-            }
-        } else {
-            LogHelper.errorLog("Componenet sizes are wrong " + componentPositions.size() + " " + componentItems.size());
-            LogHelper.errorLog("TE at " + LogHelper.getPosString(getPos()));
-            componentPositions = new ArrayList<>(8);
-            componentItems = new ArrayList<>(8);
-        }
-
-        setCore(info.core);
-        updateInternals();
-
-        energy.setEnergyStored(info.energy);
-
-        locked = info.locked;
-        if (locked) {
-            logic = info.logic;
-        } else {
-            logic = null;
-        }
-        batteryBehaviour = info.batteryBehaviour;
-        curOp = info.curOp;
-        //this is set 2 negative one in a network update, theres a good change the core angle will dysync but it looks really dodgy if we try and synce them
-        //TODO maybe try fix this? sounds hard and pointless
-        if (info.coreAngle != -1) {
-            coreAngle = info.coreAngle;
-        }
-        coreSpeed = info.coreSpeed;
-        if (info.curTime != 0) {
-            coreSpeed += (worldObj.getTotalWorldTime() - info.curTime) * ACCELERATION * curOp.scale;
-            if (coreSpeed <= 0) {
-                coreSpeed = 0;
-            }
-        }
-        if (locked) {
-            logic.postDeserialize(this);
-        }
-        */
-    }
 
     @Override
     public void update() {
@@ -534,7 +455,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             receivedOrSent = false;
 
             if (vDirty) {
-                PacketHandler.sendToLoaded(getWorld(), getPos(), new BlockRenderUpdater(getMachineInfo(), getPos()));
+                PacketHandler.sendToLoaded(getWorld(), getPos(), new BlockRenderUpdater(this));
                 vDirty = false;
                 rfUpdate = false;
                 markDirty();
@@ -564,13 +485,12 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         dataHandle.read(compound, this);
-
         super.readFromNBT(compound);
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        getMachineInfo().writeNBT(compound);
+        dataHandle.write(compound, this);
         return super.writeToNBT(compound);
     }
 //TODO allow for insertion of components?

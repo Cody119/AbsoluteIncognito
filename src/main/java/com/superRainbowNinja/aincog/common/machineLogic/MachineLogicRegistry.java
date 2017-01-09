@@ -57,12 +57,17 @@ public enum MachineLogicRegistry {
     }
 
     public static void serializeLogic(IMachineLogic logic, ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, logic.getName());
-        logic.serialize(buf);
+        if (logic != null) {
+            ByteBufUtils.writeUTF8String(buf, logic.getName());
+            logic.serialize(buf);
+        } else {
+            ByteBufUtils.writeUTF8String(buf, "");
+        }
     }
 
     public IMachineLogic deserializeLogic(ByteBuf buf) {
         String name = ByteBufUtils.readUTF8String(buf);
+        if (name.equals("")) return null;
         IMachineLogicProvider provider = providerMap.get(name);
         if (provider != null) {
             return provider.deserializeLogic(name, buf);
@@ -70,14 +75,20 @@ public enum MachineLogicRegistry {
         return null;
     }
 
-    public NBTTagCompound writeLogic(NBTTagCompound compound, IMachineLogic logic) {
-        compound.setString(KEY_LOGIC_NAME, logic.getName());
-        NBTUtils.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
+    public static NBTTagCompound writeLogic(NBTTagCompound compound, IMachineLogic logic) {
+        if (logic != null) {
+            compound.setString(KEY_LOGIC_NAME, logic.getName());
+            NBTUtils.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
+        } else {
+            compound.setString(KEY_LOGIC_NAME, "");
+        }
         return compound;
     }
 
     public IMachineLogic readLogic(NBTTagCompound compound) {
-        IMachineLogic logic = MachineLogicRegistry.INSTANCE.getLogic(compound.getString(KEY_LOGIC_NAME));
+        String name = compound.getString(KEY_LOGIC_NAME);
+        //if (name.equals("")) return null;
+        IMachineLogic logic = MachineLogicRegistry.INSTANCE.getLogic(name);
         if (logic != null) {
             NBTUtils.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
         }

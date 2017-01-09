@@ -1,6 +1,5 @@
 package com.superRainbowNinja.aincog.common.capabilites;
 
-import com.superRainbowNinja.aincog.common.network.MachineInfo;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
