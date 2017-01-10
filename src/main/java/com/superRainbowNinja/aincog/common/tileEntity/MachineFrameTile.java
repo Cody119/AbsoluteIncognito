@@ -30,13 +30,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
-import scala.tools.cmd.gen.AnyValReps;
 
 import javax.annotation.Nullable;
-import javax.crypto.Mac;
 import java.util.ArrayList;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * Created by SuperRainbowNinja on 10/10/2016.
@@ -484,13 +480,13 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        dataHandle.read(compound, this);
+        DATA_HANDLE.read(compound, this);
         super.readFromNBT(compound);
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        dataHandle.write(compound, this);
+        DATA_HANDLE.write(compound, this);
         return super.writeToNBT(compound);
     }
 //TODO allow for insertion of components?
@@ -664,7 +660,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     //it is unchecked in code but from visual inspection it is quite clear this is fine
     @SuppressWarnings("unchecked")
-    public static final DataBundle<MachineFrameTile> dataHandle = DataBundle.create(
+    public static final DataBundle<MachineFrameTile> DATA_HANDLE = DataBundle.create(
             new InvHandle<>(MachineInfo.KEY_INVENTORY, tile -> tile, MachineFrameTile::resizeInv),
             ListHandle.getInvListHandle(MachineInfo.KEY_COMP_ITEMS, MachineFrameTile::getComponentItems,
                     (tile, itemStacks) -> tile.componentItems = (ArrayList<ItemStack>) itemStacks),
@@ -682,6 +678,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             //TODO this only really needs to exsist client side, maybe make it finish at pos 0? then it dosent need 2 be synced
             //new IntegerHandle<>(MachineInfo.KEY_CORE_ANGLE, MachineFrameTile::getCoreAngle, (tile, integer) -> {if (integer != -1) tile.coreAngle = integer;})
             //TODO core speed
+            //TODO call this in onLoad?
             new Instruction<>("PostDeserialize", (tile) -> {if (tile.locked) tile.logic.postDeserialize(tile);})
     );
 }

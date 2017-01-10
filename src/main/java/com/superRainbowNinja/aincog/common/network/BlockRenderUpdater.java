@@ -46,13 +46,13 @@ public class BlockRenderUpdater extends TileEntityPacket {
     @Override
     public void fromBytes(ByteBuf buf) {
         super.fromBytes(buf);
-        data = (Object[])MachineFrameTile.dataHandle.read(buf);
+        data = (Object[])MachineFrameTile.DATA_HANDLE.read(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         super.toBytes(buf);
-        MachineFrameTile.dataHandle.write(buf, tile);
+        MachineFrameTile.DATA_HANDLE.write(buf, tile);
     }
 
     public static class Handle implements IMessageHandler<BlockRenderUpdater, IMessage>{
@@ -73,7 +73,7 @@ public class BlockRenderUpdater extends TileEntityPacket {
                 TileEntity te = mc.theWorld.getTileEntity(message.getPos());
                 if (te instanceof MachineFrameTile) {
                     //((IMachineInfoProvider) te).updateMachine(message.getData());
-                    MachineFrameTile.dataHandle.readFromCache(message.getData(), ((MachineFrameTile) te));
+                    MachineFrameTile.DATA_HANDLE.readFromCache(message.getData(), ((MachineFrameTile) te));
                 } else {
                     LogHelper.errorLog("Server sent AI render data at " + message.pos + " but no AI tile entity exists");
                 }

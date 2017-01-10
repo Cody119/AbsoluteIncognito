@@ -1,18 +1,10 @@
 package com.superRainbowNinja.aincog.common.network;
 
-import com.superRainbowNinja.aincog.common.blocks.MachineFrame;
-import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
-import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
-import com.superRainbowNinja.aincog.util.ExactPosition;
-import com.superRainbowNinja.aincog.util.NBTUtils;
-import com.superRainbowNinja.aincog.util.Operation;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
@@ -103,7 +95,7 @@ public class MachineInfo {
         coreSpeed = buf.readInt();
         curTime = buf.readLong();
         */
-        data = MachineFrameTile.dataHandle.read(buf);
+        data = MachineFrameTile.DATA_HANDLE.read(buf);
     }
 
     public void toBytes(ByteBuf buf) {
@@ -141,7 +133,7 @@ public class MachineInfo {
             System.out.println("sent invalid state");
         }
         */
-        MachineFrameTile.dataHandle.write(buf, tile);
+        MachineFrameTile.DATA_HANDLE.write(buf, tile);
     }
 
     public NBTTagCompound writeNBT(NBTTagCompound compound) {
@@ -166,7 +158,7 @@ public class MachineInfo {
         compound.setInteger(KEY_CORE_ANGLE, coreAngle);
         compound.setInteger(KEY_CORE_SPEED, coreSpeed);
         */
-        MachineFrameTile.dataHandle.write(compound, tile);
+        MachineFrameTile.DATA_HANDLE.write(compound, tile);
         return compound;
     }
 
@@ -190,6 +182,6 @@ public class MachineInfo {
         coreAngle = compound.getInteger(KEY_CORE_ANGLE);
         coreSpeed = compound.getInteger(KEY_CORE_SPEED);
         */
-        data = MachineFrameTile.dataHandle.read(compound);
+        data = MachineFrameTile.DATA_HANDLE.read(compound);
     }
 }
