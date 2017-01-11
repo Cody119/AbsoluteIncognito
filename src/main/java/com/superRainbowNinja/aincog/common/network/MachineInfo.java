@@ -1,18 +1,10 @@
 package com.superRainbowNinja.aincog.common.network;
 
-import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
-import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
-import com.superRainbowNinja.aincog.util.EnumPosition;
-import com.superRainbowNinja.aincog.util.ExactPosition;
-import com.superRainbowNinja.aincog.util.NBTHelper;
-import com.superRainbowNinja.aincog.util.Operation;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
@@ -37,7 +29,7 @@ public class MachineInfo {
 
     static final ArrayList EMPTY_LIST = new ArrayList(0);
     public static final ItemStack[] EMPTY_ITEM_STACKS = new ItemStack[0];
-
+/*
     //give everything defualt values as it is a capability
     public ItemStack[] inv;
     public ArrayList<ItemStack> compItems;
@@ -52,61 +44,25 @@ public class MachineInfo {
     public int coreAngle;
     public int coreSpeed;
     public long curTime;
+*/
+    private MachineFrameTile tile;
+    public Object data;
 
     public MachineInfo(ByteBuf buf) {
         fromBytes(buf);
-        curTime = 0;
     };
 
-    public MachineInfo() {}
+    public MachineInfo(MachineFrameTile tileIn) {
+        tile = tileIn;
+    }
 
     public MachineInfo(NBTTagCompound compound) {
         readNBT(compound);
     }
 
-    public void addInv(ItemStack[] invIn) {
-        inv = invIn;
-    }
-
-    public void addComponents(ArrayList<ItemStack> items, ArrayList<ExactPosition> positions) {
-        compItems = items;
-        compPos = positions;
-    }
-
-    public void addEnergy(int energyIn) {
-        energy = energyIn;
-    }
-
-    public void addLogic(@Nullable IMachineLogic logicIn) {
-        logic = logicIn;
-        locked = logicIn != null;
-    }
-
-    public void addCore(ItemStack stackIn) {
-        core = stackIn;
-    }
-
-    public void addBatteryBehaviour(MachineFrameTile.BatteryBehaviour b) {
-        batteryBehaviour = b;
-    }
-
-    public void addCurrentOperation(Operation op) {
-        curOp = op;
-    }
-
-    public void addCurrentTime(long time) {
-        curTime = time;
-    }
-
-    public void addCoreAngle(int angle) {
-        coreAngle = angle;
-    }
-
-    public void addCoreSpeed(int speed) {
-        coreSpeed = speed;
-    }
 
     public void fromBytes(ByteBuf buf) {
+        /*
         int len = buf.readInt();
         compItems = new ArrayList<>(8);
         compPos = new ArrayList<>(8);
@@ -138,15 +94,18 @@ public class MachineInfo {
         coreAngle = buf.readInt();
         coreSpeed = buf.readInt();
         curTime = buf.readLong();
+        */
+        data = MachineFrameTile.DATA_HANDLE.read(buf);
     }
 
     public void toBytes(ByteBuf buf) {
+        /*
         buf.writeInt(compItems.size());
         for (ItemStack item : compItems) {
             ByteBufUtils.writeItemStack(buf, item);
         }
         for (ExactPosition pos : compPos) {
-            pos.toBytes(buf);
+            pos.write(buf);
         }
         buf.writeInt(inv.length);
         for (int i = 0; i < inv.length; i++) {
@@ -173,19 +132,22 @@ public class MachineInfo {
         if (core == null && curOp != Operation.NOP) {
             System.out.println("sent invalid state");
         }
+        */
+        MachineFrameTile.DATA_HANDLE.write(buf, tile);
     }
 
     public NBTTagCompound writeNBT(NBTTagCompound compound) {
-        NBTHelper.writeInventoryArray(inv, compound, KEY_INVENTORY);
-        NBTHelper.writeInventory(compItems, compound, KEY_COMP_ITEMS);
-        NBTHelper.writePositions(compPos, compound, KEY_COMP_POS);
+        /*
+        NBTUtils.writeInventoryArray(inv, compound, KEY_INVENTORY);
+        NBTUtils.writeInventory(compItems, compound, KEY_COMP_ITEMS);
+        NBTUtils.writePositions(compPos, compound, KEY_COMP_POS);
 
         compound.setInteger(KEY_ENERGY, energy);
         compound.setBoolean(KEY_LOCKED, locked);
 
         if (locked) {
             compound.setString(KEY_LOGIC_NAME, logic.getName());
-            NBTHelper.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
+            NBTUtils.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
         }
 
         if (core != null) {
@@ -195,20 +157,23 @@ public class MachineInfo {
         compound.setInteger(KEY_CUR_OP, curOp.ordinal());
         compound.setInteger(KEY_CORE_ANGLE, coreAngle);
         compound.setInteger(KEY_CORE_SPEED, coreSpeed);
+        */
+        MachineFrameTile.DATA_HANDLE.write(compound, tile);
         return compound;
     }
 
     public void readNBT(NBTTagCompound compound) {
-        inv = NBTHelper.readInventoryArray(compound, KEY_INVENTORY);
-        compItems = NBTHelper.readInventory(compound, KEY_COMP_ITEMS);
-        compPos = NBTHelper.readPositions(compound, KEY_COMP_POS);
+        /*
+        inv = NBTUtils.readInventoryArray(compound, KEY_INVENTORY);
+        compItems = NBTUtils.readInventory(compound, KEY_COMP_ITEMS);
+        compPos = NBTUtils.readPositions(compound, KEY_COMP_POS);
 
         energy = compound.getInteger(KEY_ENERGY);
         logic = null;
         if (locked = compound.getBoolean(KEY_LOCKED)) {
             logic = MachineLogicRegistry.INSTANCE.getLogic(compound.getString(KEY_LOGIC_NAME));
             if (logic != null) {
-                NBTHelper.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
+                NBTUtils.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
             }
         }
         batteryBehaviour = MachineFrameTile.BatteryBehaviour.get(compound.getInteger(KEY_BATTERY_BEHAVE));
@@ -216,5 +181,7 @@ public class MachineInfo {
         core = ItemStack.loadItemStackFromNBT(compound.getCompoundTag(KEY_CORE));
         coreAngle = compound.getInteger(KEY_CORE_ANGLE);
         coreSpeed = compound.getInteger(KEY_CORE_SPEED);
+        */
+        data = MachineFrameTile.DATA_HANDLE.read(compound);
     }
 }

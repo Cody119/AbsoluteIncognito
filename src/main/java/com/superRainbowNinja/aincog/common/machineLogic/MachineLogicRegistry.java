@@ -2,8 +2,10 @@ package com.superRainbowNinja.aincog.common.machineLogic;
 
 import com.google.common.collect.Maps;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
+import com.superRainbowNinja.aincog.util.NBTUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import java.nio.channels.ByteChannel;
@@ -15,6 +17,10 @@ import java.util.Map;
  */
 public enum MachineLogicRegistry {
     INSTANCE;
+
+    public static final String KEY_LOGIC = "LOGIC";
+    public static final String KEY_LOGIC_NAME = "LOGIC_NAME";
+
     ArrayList<IMachineLogicProvider> logicProviders;
     Map<String, IMachineLogicProvider> providerMap;
 
@@ -51,17 +57,42 @@ public enum MachineLogicRegistry {
     }
 
     public static void serializeLogic(IMachineLogic logic, ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, logic.getName());
-        logic.serialize(buf);
+        if (logic != null) {
+            ByteBufUtils.writeUTF8String(buf, logic.getName());
+            logic.serialize(buf);
+        } else {
+            ByteBufUtils.writeUTF8String(buf, "");
+        }
     }
 
     public IMachineLogic deserializeLogic(ByteBuf buf) {
         String name = ByteBufUtils.readUTF8String(buf);
+        if (name.equals("")) return null;
         IMachineLogicProvider provider = providerMap.get(name);
         if (provider != null) {
             return provider.deserializeLogic(name, buf);
         }
         return null;
+    }
+
+    public static NBTTagCompound writeLogic(NBTTagCompound compound, IMachineLogic logic) {
+        if (logic != null) {
+            compound.setString(KEY_LOGIC_NAME, logic.getName());
+            NBTUtils.writeObject(compound, KEY_LOGIC, logic::writeToNBT);
+        } else {
+            compound.setString(KEY_LOGIC_NAME, "");
+        }
+        return compound;
+    }
+
+    public IMachineLogic readLogic(NBTTagCompound compound) {
+        String name = compound.getString(KEY_LOGIC_NAME);
+        //if (name.equals("")) return null;
+        IMachineLogic logic = MachineLogicRegistry.INSTANCE.getLogic(name);
+        if (logic != null) {
+            NBTUtils.readObject(compound, KEY_LOGIC, (nbt) -> logic.readFromNBT(nbt));
+        }
+        return logic;
     }
 
     public IMachineLogic tryGetLogic(MachineFrameTile m) {

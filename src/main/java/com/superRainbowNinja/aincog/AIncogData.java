@@ -153,6 +153,5 @@ public class AIncogData {
         GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MACHINE_LOCK, "BBB", "BGB", "BBB", 'G', "blockGlass", 'B', Blocks.IRON_BARS));
         GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MAKESHIFT_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', "stickWood", 'R', "dustRedstone"));
         GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MAKESHIFT_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', "stickWood", 'R', "dustRedstone"));
-
     }
 }

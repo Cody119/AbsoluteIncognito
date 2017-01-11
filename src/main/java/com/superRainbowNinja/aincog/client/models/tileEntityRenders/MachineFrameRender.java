@@ -46,43 +46,43 @@ public class MachineFrameRender extends TileEntitySpecialRenderer<MachineFrameTi
     @Override
     public void renderTileEntityAt(MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage) {
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
-
-        Minecraft minecraft = Minecraft.getMinecraft();
-        RenderItem iRen = minecraft.getRenderItem();
-        minecraft.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        //render block model
-        {
-            World world = teIn.getWorld();
-            BlockPos pos = teIn.getPos();
-            BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
-            IBakedModel model = dispatcher.getModelForState(world.getBlockState(pos).getActualState(world, pos));
-
-            float energyPerc = teIn.getEnergyRatio();
-            dispatcher.getBlockModelRenderer().renderModelBrightnessColor(model, 1, 1f, 1f - energyPerc * 0.65f, 1f - energyPerc * 0.65f);
-        }
-
-        //render componenets
-        ArrayList<ItemStack> components = teIn.getComponentItems();
-        ArrayList<ExactPosition> componentPositions = teIn.getComponentPositions();
-
-        for (int i = 0; i < components.size(); i++) {
             GlStateManager.pushMatrix();
-            ExactPosition pos = componentPositions.get(i);
-            GlStateManager.translate(pos.getXOffset(), pos.getYOffset(), pos.getZOffset());
-            int rot = pos.getRotation();
-            if (rot != 0) {
-                GlStateManager.rotate(rot, 0, 1, 0);
+            GlStateManager.translate(x, y, z);
+
+            Minecraft minecraft = Minecraft.getMinecraft();
+            RenderItem iRen = minecraft.getRenderItem();
+            minecraft.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+            //render block model
+            {
+                World world = teIn.getWorld();
+                BlockPos pos = teIn.getPos();
+                BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
+                IBakedModel model = dispatcher.getModelForState(world.getBlockState(pos).getActualState(world, pos));
+
+                float energyPerc = teIn.getEnergyRatio();
+                dispatcher.getBlockModelRenderer().renderModelBrightnessColor(model, 1, 1f, 1f - energyPerc * 0.65f, 1f - energyPerc * 0.65f);
             }
-            iRen.renderItem(components.get(i), ItemCameraTransforms.TransformType.NONE);
+
+            //render componenets
+            ArrayList<ItemStack> components = teIn.getComponentItems();
+            ArrayList<ExactPosition> componentPositions = teIn.getComponentPositions();
+
+            for (int i = 0; i < components.size(); i++) {
+                GlStateManager.pushMatrix();
+                ExactPosition pos = componentPositions.get(i);
+                GlStateManager.translate(pos.getXOffset(), pos.getYOffset(), pos.getZOffset());
+                int rot = pos.getRotation();
+                if (rot != 0) {
+                    GlStateManager.rotate(rot, 0, 1, 0);
+                }
+                iRen.renderItem(components.get(i), ItemCameraTransforms.TransformType.NONE);
+                GlStateManager.popMatrix();
+            }
+
             GlStateManager.popMatrix();
-        }
 
-        GlStateManager.popMatrix();
-
-        //temp lock indicator
+            //temp lock indicator
         /*
         if (teIn.isLocked()) {
             GlStateManager.pushMatrix();
@@ -107,20 +107,21 @@ public class MachineFrameRender extends TileEntitySpecialRenderer<MachineFrameTi
         }
         */
 
-        //render core
-        ItemStack coreStack = teIn.getCoreStack();
-        if (coreStack != null) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5, y + 1, z + 0.5);
-            GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);
-            GlStateManager.rotate((teIn.getCoreAngle() + (teIn.getCoreSpeed() * partialTicks)), 0, 1, 0);
-            GlStateManager.rotate(90, 1, 0, 0);
-            iRen.renderItem(coreStack, ItemCameraTransforms.TransformType.NONE);
-            GlStateManager.popMatrix();
-        }
-        //logic render
-        if (teIn.isLocked()) {
-            teIn.getLogic().renderTileEntityAt(this, teIn, x, y, z, partialTicks, destroyStage);
-        }
+            //render core
+            ItemStack coreStack = teIn.getCoreStack();
+            if (coreStack != null) {
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(x + 0.5, y + 1, z + 0.5);
+                GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);
+                GlStateManager.rotate((teIn.getCoreAngle() + (teIn.getCoreSpeed() * partialTicks)), 0, 1, 0);
+                GlStateManager.rotate(90, 1, 0, 0);
+                iRen.renderItem(coreStack, ItemCameraTransforms.TransformType.NONE);
+                GlStateManager.popMatrix();
+            }
+            //logic render
+            if (teIn.isLocked()) {
+                teIn.getLogic().renderTileEntityAt(this, teIn, x, y, z, partialTicks, destroyStage);
+            }
+
     }
 }

@@ -12,6 +12,7 @@ import com.superRainbowNinja.aincog.common.machineLogic.IMachineLogic;
 import com.superRainbowNinja.aincog.common.machineLogic.MachineLogicRegistry;
 import com.superRainbowNinja.aincog.common.network.*;
 import com.superRainbowNinja.aincog.util.*;
+import com.superRainbowNinja.aincog.util.DataHandle.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.util.EnumParticleTypes;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
  * TODO core chat channel
  * TODO maybe make componets render slightly closer (on y-axis) when theres only 2 layers?
  */
-public class MachineFrameTile extends TileEntity implements ITickable, ISidedInventory, IMachineInfoProvider, IEnergyHandler, IEnergyProvider, IEnergyReceiver, IRfUpdater {
+public class MachineFrameTile extends TileEntity implements ITickable, ISidedInventory, IEnergyHandler, IEnergyProvider, IEnergyReceiver, IRfUpdater {
     private static final int MAX_RF_SEND = 100;
     //core spinning
     private static final int ACCELERATION = 1;
@@ -440,81 +441,6 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     /*---------------------------
     |  Override Methods          |
     ----------------------------*/
-    @Override
-    public MachineInfo getMachineInfo() {
-        MachineInfo info = new MachineInfo();
-        info.addInv(inv);
-        info.addComponents(componentItems, componentPositions);
-        info.addCore(coreStack);
-        info.addEnergy(energy.getEnergyStored());
-        info.addLogic(locked ? logic : null);
-        info.addBatteryBehaviour(batteryBehaviour);
-        info.addCurrentOperation(curOp);
-        info.addCoreAngle(coreAngle);
-        info.addCoreSpeed(coreSpeed);
-        info.addCurrentTime(worldObj.getTotalWorldTime());
-        return info;
-    }
-
-    @Override
-    public void updateMachine(MachineInfo info) {
-        inv = info.inv;
-        componentItems = new ArrayList<>(8);
-        componentItems.addAll(info.compItems);
-
-        componentPositions = new ArrayList<>(8);
-        componentPositions.addAll(info.compPos);
-
-        if (componentPositions.size() == componentItems.size()) {
-            int i = 0;
-            while (i < componentItems.size()) {
-                if (componentItems.get(i) == null || componentPositions.get(i) == null) {
-
-                    LogHelper.errorLog("Error, found null entries in components at index: " + i);
-                    LogHelper.errorLog(componentItems.get(i) + " and " + componentPositions.get(i));
-                    LogHelper.errorLog("TE at " + LogHelper.getPosString(getPos()));
-                    componentPositions.remove(i);
-                    componentItems.remove(i);
-                    continue;
-                }
-                i++;
-            }
-        } else {
-            LogHelper.errorLog("Componenet sizes are wrong " + componentPositions.size() + " " + componentItems.size());
-            LogHelper.errorLog("TE at " + LogHelper.getPosString(getPos()));
-            componentPositions = new ArrayList<>(8);
-            componentItems = new ArrayList<>(8);
-        }
-
-        setCore(info.core);
-        updateInternals();
-
-        energy.setEnergyStored(info.energy);
-
-        locked = info.locked;
-        if (locked) {
-            logic = info.logic;
-        } else {
-            logic = null;
-        }
-        batteryBehaviour = info.batteryBehaviour;
-        curOp = info.curOp;
-        //this is set 2 negative one in a network update, theres a good change the core angle will dysync but it looks really dodgy if we try and synce them
-        //TODO maybe try fix this? sounds hard and pointless
-        if (info.coreAngle != -1) {
-            coreAngle = info.coreAngle;
-        }
-        coreSpeed = info.coreSpeed;
-        if (info.curTime != 0) {
-            coreSpeed += (worldObj.getTotalWorldTime() - info.curTime) * ACCELERATION * curOp.scale;
-            if (coreSpeed <= 0) {
-                coreSpeed = 0;
-            }
-        }
-        if (locked) {
-            logic.postDeserialize(this);
-        }
-    }
 
     @Override
     public void update() {
@@ -528,7 +454,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             receivedOrSent = false;
 
             if (vDirty) {
-                PacketHandler.sendToLoaded(getWorld(), getPos(), new BlockRenderUpdater(getMachineInfo(), getPos()));
+                PacketHandler.sendToLoaded(getWorld(), getPos(), new BlockRenderUpdater(this));
                 vDirty = false;
                 rfUpdate = false;
                 markDirty();
@@ -557,13 +483,13 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        updateMachine(new MachineInfo(compound));
+        DATA_HANDLE.read(compound, this);
         super.readFromNBT(compound);
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        getMachineInfo().writeNBT(compound);
+        DATA_HANDLE.write(compound, this);
         return super.writeToNBT(compound);
     }
 //TODO allow for insertion of components?
@@ -734,4 +660,28 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     public int getRfForUpdate() {
         return energy.getEnergyStored();
     }
+
+    //it is unchecked in code but from visual inspection it is quite clear this is fine
+    @SuppressWarnings("unchecked")
+    public static final DataBundle<MachineFrameTile> DATA_HANDLE = DataBundle.create(
+            new InvHandle<>(MachineInfo.KEY_INVENTORY, tile -> tile, MachineFrameTile::resizeInv),
+            ListHandle.getInvListHandle(MachineInfo.KEY_COMP_ITEMS, MachineFrameTile::getComponentItems,
+                    (tile, itemStacks) -> tile.componentItems = (ArrayList<ItemStack>) itemStacks),
+            ListHandle.getPosListHandle(MachineInfo.KEY_COMP_POS, MachineFrameTile::getComponentPositions,
+                    ((tile, exactPositions) -> tile.componentPositions = (ArrayList<ExactPosition>) exactPositions)),
+            new ItemStackHandler<>(MachineInfo.KEY_CORE, MachineFrameTile::getCoreStack, MachineFrameTile::setCore),
+            new Instruction<>("UpdateInternals", MachineFrameTile::updateInternals),
+            new IntegerHandle<>(MachineInfo.KEY_ENERGY, (tile) -> tile.energy.getEnergyStored(), (o, integer) -> o.energy.setEnergyStored(integer)),
+            new BooleanHandle<>(MachineInfo.KEY_LOCKED, MachineFrameTile::isLocked, (tile, aBoolean) -> tile.locked = aBoolean),
+            new LogicHandle<>(MachineInfo.KEY_LOGIC, MachineFrameTile::getLogic, (tile, logic1) -> tile.logic = tile.locked ? logic1 : null),
+            new EnumHandler<>(MachineInfo.KEY_BATTERY_BEHAVE, MachineFrameTile::getBatteryBehaviour,
+                    MachineFrameTile::setBatteryBehaviour, BatteryBehaviour.values()),
+            new EnumHandler<>(MachineInfo.KEY_CUR_OP, MachineFrameTile::getCurOp,
+                    (tile, operation) -> tile.curOp = operation != null ? operation : Operation.NOP, Operation.values()),
+            //TODO this only really needs to exsist client side, maybe make it finish at pos 0? then it dosent need 2 be synced
+            //new IntegerHandle<>(MachineInfo.KEY_CORE_ANGLE, MachineFrameTile::getCoreAngle, (tile, integer) -> {if (integer != -1) tile.coreAngle = integer;})
+            //TODO core speed
+            //TODO call this in onLoad?
+            new Instruction<>("PostDeserialize", (tile) -> {if (tile.locked) tile.logic.postDeserialize(tile);})
+    );
 }

@@ -2,7 +2,6 @@ package com.superRainbowNinja.aincog.common.network;
 
 import com.superRainbowNinja.aincog.common.capabilites.IPoweredWeaponCap;
 import com.superRainbowNinja.aincog.common.capabilites.PoweredWeaponCapImp;
-import com.superRainbowNinja.aincog.common.tileEntity.IMachineInfoProvider;
 import com.superRainbowNinja.aincog.util.LogHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;

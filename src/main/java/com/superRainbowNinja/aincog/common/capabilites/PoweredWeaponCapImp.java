@@ -13,14 +13,6 @@ import javax.annotation.Nullable;
 /**
  * Created by SuperRainbowNinja on 9/10/2016.
  *
- * if ur having issues make sure ur serializing everything
- *
- *
- * TODO majour sync issues when using a dedicated server, might just save everything in the items nbt and cache it in this class (think nbt is auto synced, probs check)
- * TODO would like to find another fix but i dont think there is one
- *      A few notes when implementing that
- *          - In the onItemCreate event (when u attatch the cap) pass the itemstack to the cap constructor
- *          - cache the data in this class, but keep it synced with the nbt (cache for rendering and such)
  *
  */
 public class PoweredWeaponCapImp implements IPoweredWeaponCap, ICapabilitySerializable<NBTTagCompound> {
