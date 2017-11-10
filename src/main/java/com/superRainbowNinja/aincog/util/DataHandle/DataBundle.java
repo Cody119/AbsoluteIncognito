@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * Created by SuperRainbowNinja on 24/12/2016.
+ * TODO special method that ignores Instructions, or something? handle load checks better
  */
 
 public class DataBundle<T> implements IFieldHandle<T> {

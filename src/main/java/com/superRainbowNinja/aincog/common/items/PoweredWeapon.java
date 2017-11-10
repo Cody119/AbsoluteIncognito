@@ -316,7 +316,6 @@ public class PoweredWeapon extends AIItemBase {
         }
     }
 
-
     public static ModelResourceLocation HANDLE = new ModelResourceLocation(Reference.MOD_ID + ":" + "laser_sword", "inventory");
     public static ModelResourceLocation BLADE = new ModelResourceLocation(Reference.MOD_ID + ":" + "laser_sword_blade", "inventory");
     public static ModelResourceLocation CORE = new ModelResourceLocation(Reference.MOD_ID + ":" + "laser_sword_core", "inventory");

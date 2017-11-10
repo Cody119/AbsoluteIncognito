@@ -64,6 +64,7 @@ public class ArcFurnaceLogic extends FluidLogic {
         boolean check(IInventory stacks);
         default int processTime() {return 80;}
         FluidStack getOutput();
+        //TODO return output?
         void consume(IInventory tile);
     }
 
