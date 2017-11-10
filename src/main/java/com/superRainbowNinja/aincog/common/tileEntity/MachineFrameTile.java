@@ -67,7 +67,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     //this is undefined if locked is false (generally should be null in that scenario)
     private IMachineLogic logic;
     //should only be used on the server side, indicates if the machine received or sent rf this tick, if it did it cannot send rf this tick
-    private boolean receivedOrSent; //if energy was recived or sent this tick
+    //private boolean receivedOrSent; //if energy was recived or sent this tick (only used to limit energy flow, not for any complicated internal stuff)
     //dosent need 2 be saved, used on server side to denote the need for a full render update
     private boolean vDirty = false;
     private boolean rfUpdate = false;
@@ -448,10 +448,11 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             logic.tick(this);
 
         if (!worldObj.isRemote) {
-            if (batteryBehaviour != BatteryBehaviour.ACCEPT && !receivedOrSent && EnergyUtils.sendEnergyToSides(getWorld(), getPos(), energy, MAX_RF_SEND)) {
+            //TODO remoce battery behaviour and just make machines balance energy?
+            if (/*batteryBehaviour != BatteryBehaviour.ACCEPT &&*/ EnergyUtils.sendEnergyToSides(getWorld(), getPos(), energy, MAX_RF_SEND)) {
                 markRfUpdate();
             }
-            receivedOrSent = false;
+            //receivedOrSent = false;
 
             if (vDirty) {
                 PacketHandler.sendToLoaded(getWorld(), getPos(), new BlockRenderUpdater(this));
@@ -492,6 +493,8 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         DATA_HANDLE.write(compound, this);
         return super.writeToNBT(compound);
     }
+
+
 //TODO allow for insertion of components?
     @Override
     public int[] getSlotsForFace(EnumFacing side) {
@@ -633,20 +636,22 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        int i = batteryBehaviour != BatteryBehaviour.PROVIDE ? energy.receiveEnergy(maxReceive, simulate) : 0;
+        //int i = batteryBehaviour != BatteryBehaviour.PROVIDE ? energy.receiveEnergy(maxReceive, simulate) : 0;
+        int i = energy.receiveEnergy(maxReceive, simulate);
         if (i != 0) {
             markRfUpdate();
-            receivedOrSent = true;
+            //receivedOrSent = true;
         }
         return i;
     }
 
     @Override
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        int i = batteryBehaviour != BatteryBehaviour.ACCEPT ? energy.extractEnergy(maxExtract, simulate) : 0;
+        //int i = batteryBehaviour != BatteryBehaviour.ACCEPT ? energy.extractEnergy(maxExtract, simulate) : 0;
+        int i = energy.extractEnergy(maxExtract, simulate);
         if (i != 0) {
             markRfUpdate();
-            receivedOrSent = true;
+            //receivedOrSent = true;
         }
         return i;
     }
