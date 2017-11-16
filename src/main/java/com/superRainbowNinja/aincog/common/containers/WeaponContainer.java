@@ -77,7 +77,12 @@ public class WeaponContainer  extends Container {
 
     public void slotChange() {
         if (player.inventory.getStackInSlot(weaponSlot) == null) {
-            closeInv(true);
+            // This means the item disappeared from where we
+            // excepted it to be.... not good
+            // the code is in place 2 throw the whatever is in the core stack into the world
+            // although since the sword has been moved without being updated this will likely dupe it,
+            // so should be fine not doing that
+            closeInv(false);
         } else {
             dirty = true;
         }

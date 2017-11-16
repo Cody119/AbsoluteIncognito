@@ -87,6 +87,10 @@ public class ExactPosition implements IRenderPos{
         return y == 1;
     }
 
+    public  boolean isBottom() {
+        return !isTop();
+    }
+
     public boolean isWholeLayer() {
         return wholeLayer;
     }

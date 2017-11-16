@@ -170,7 +170,7 @@ public class GeneratorLogic implements IMachineLogic {
 
     @Override
     public void coreRemoved(MachineFrameTile teIn) {
-        rfMiniBuf = 0; //the operation will auto be wipped, we just need 2 worry about internals of this class
+        rfMiniBuf = 0; //the operation will be auto wipped, we just need 2 worry about internals of this class
     }
 
     @Override

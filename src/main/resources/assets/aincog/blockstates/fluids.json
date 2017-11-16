@@ -5,6 +5,9 @@
         "transform": "forge:default-item"
     },
     "variants": {
+        "white_crystal_fluid": [{
+            "custom": { "fluid": "white_crystal" }
+        }],
         "green_crystal_fluid": [{
             "custom": { "fluid": "green_crystal" }
         }],
@@ -13,6 +16,9 @@
         }],
         "blue_crystal_fluid": [{
             "custom": { "fluid": "blue_crystal" }
+        }],
+        "rainbow_crystal_fluid": [{
+            "custom": { "fluid": "rainbow_crystal" }
         }]
     }
 }

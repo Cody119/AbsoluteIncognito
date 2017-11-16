@@ -12,7 +12,10 @@ import javax.annotation.Nullable;
 public interface ICore {
     boolean coreIsFunctional(ItemStack stack);
 
-    enum CoreType {BASIC, NORMAL, ADVANCED}
+    //Extreme will probably only be attained through overclocking
+    // (for cores in this mod anyway, if i ever add some 3rd party integration
+    // then maybe some of those will be)
+    enum CoreType {PITIFUL, BASIC, NORMAL, ADVANCED, EXTREME}
 
     int getMaxCoreDamage(ItemStack core);
     int getCoreDamage(ItemStack core);
@@ -27,4 +30,5 @@ public interface ICore {
 
     float getEfficiency(ItemStack core);
     float getSpeed(ItemStack core);
+    float getStrength(ItemStack core);
 }

@@ -8,6 +8,8 @@ import com.superRainbowNinja.aincog.common.IRegistryEntry;
 import com.superRainbowNinja.aincog.common.blocks.CrystalOre;
 import com.superRainbowNinja.aincog.common.blocks.MachineFrame;
 import com.superRainbowNinja.aincog.client.models.AbsoluteModelRegistry;
+import com.superRainbowNinja.aincog.common.items.BasicCore;
+import com.superRainbowNinja.aincog.common.items.CrystalBase;
 import com.superRainbowNinja.aincog.common.items.MakeshiftCore;
 import com.superRainbowNinja.aincog.common.items.PoweredWeapon;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
@@ -27,12 +29,16 @@ import static com.superRainbowNinja.aincog.common.items.PoweredWeapon.HANDLE;
  */
 public class ClientProxy extends CommonProxy {
     public static final CrystalOre.ModelBuilder CRYSTAL_ORE_MODELS = new CrystalOre.ModelBuilder();
+    public static final CrystalBase.ModelBuilder CRYSTAL_MODELS = new CrystalBase.ModelBuilder();
+    public static final BasicCore.ModelBuilder BASIC_CORE_MODELS = new BasicCore.ModelBuilder();
 
     @Override
     public void initRegistryEntry() {
         super.initRegistryEntry();
         //its important that this is registered before the actual ores
         AbsoluteModelRegistry.INSTANCE.registerModelEntry(CRYSTAL_ORE_MODELS);
+        AbsoluteModelRegistry.INSTANCE.registerModelEntry(CRYSTAL_MODELS);
+        AbsoluteModelRegistry.INSTANCE.registerModelEntry(BASIC_CORE_MODELS);
         registryEntries.forEach(IRegistryEntry::registerModels);
 
         //this loads on the server side for some reason, as far as ik it shouldnt so i muct be missing something?
@@ -72,7 +78,21 @@ public class ClientProxy extends CommonProxy {
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new PoweredWeapon.CoreColor() , AIncogData.LASER_SWORD);
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new MakeshiftCore.CoreColor(), AIncogData.MAKESHIFT_CORE);
 
-        CrystalOre.OreColor color = AIncogData.RED_CRYSTAL_ORE.getOreColor();
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.WHITE_CRYSTAL.getColor(), AIncogData.WHITE_CRYSTAL);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.RED_CRYSTAL.getColor(), AIncogData.RED_CRYSTAL);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.GREEN_CRYSTAL.getColor(), AIncogData.GREEN_CRYSTAL);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.BLUE_CRYSTAL.getColor(), AIncogData.BLUE_CRYSTAL);
+
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.WHITE_BASIC_CORE.getColor(), AIncogData.WHITE_BASIC_CORE);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.RED_BASIC_CORE.getColor(), AIncogData.RED_BASIC_CORE);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.GREEN_BASIC_CORE.getColor(), AIncogData.GREEN_BASIC_CORE);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(AIncogData.BLUE_BASIC_CORE.getColor(), AIncogData.BLUE_BASIC_CORE);
+
+        CrystalOre.OreColor color = AIncogData.WHITE_CRYSTAL_ORE.getOreColor();
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(color, AIncogData.WHITE_CRYSTAL_ORE.item);
+        Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(color, AIncogData.WHITE_CRYSTAL_ORE);
+
+        color = AIncogData.RED_CRYSTAL_ORE.getOreColor();
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(color, AIncogData.RED_CRYSTAL_ORE.item);
         Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(color, AIncogData.RED_CRYSTAL_ORE);
 

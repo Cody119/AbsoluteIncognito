@@ -8,7 +8,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 /**
  * Created by SuperRainbowNinja on 8/12/2016.
  */
-public interface ILockableTank extends IFluidHandler{
+public interface ILockableTank extends IFluidHandler {
     @CapabilityInject(ILockableTank.class)
     public Capability<ILockableTank> LOCKABLE_TANK_CAPABILITY = null;
 

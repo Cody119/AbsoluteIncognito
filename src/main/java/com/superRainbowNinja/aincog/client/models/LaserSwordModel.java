@@ -1,5 +1,6 @@
 package com.superRainbowNinja.aincog.client.models;
 
+import com.google.common.collect.ImmutableList;
 import com.superRainbowNinja.aincog.common.capabilites.IPoweredWeaponCap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -18,13 +19,16 @@ import java.util.List;
  *
  * Laser sword model generator
  *
- * TODO might generate textures dynamically in a session but will keep them cached (maybe have config option) (not so wrapped on this idea anymore, maybe)
  */
 public class LaserSwordModel extends SmartModelOverride {
 
     private IBakedModel handle;
     private IBakedModel blade;
     private IBakedModel core;
+
+    private final ImmutableList<BakedQuad> handleBare;
+    private final ImmutableList<BakedQuad> handleCore;
+    private final ImmutableList<BakedQuad> swordOn;
 
     private boolean hasCore;
     private boolean isOn;
@@ -33,6 +37,17 @@ public class LaserSwordModel extends SmartModelOverride {
         handle = handleIn;
         blade = bladeIn;
         core = coreIn;
+
+        ArrayList<BakedQuad> test = new ArrayList<>();
+        test.addAll(handle.getQuads(null, null, 0));
+        int one = test.size();
+        test.addAll(core.getQuads(null, null, 0));
+        int two = test.size();
+        test.addAll(blade.getQuads(null, null, 0));
+
+        swordOn = ImmutableList.copyOf(test);
+        handleCore = swordOn.subList(0, two);
+        handleBare = swordOn.subList(0, one);
     }
 
     @Override
@@ -43,16 +58,24 @@ public class LaserSwordModel extends SmartModelOverride {
 
         return originalModel;
     }
-//this could be faster
+
     @Override
     public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
-        List<BakedQuad> tmp = new ArrayList<BakedQuad>(handle.getQuads(state, side, rand));
+//        List<BakedQuad> tmp = new ArrayList<BakedQuad>(handle.getQuads(state, side, rand));
+//        if (hasCore) {
+//            tmp.addAll(core.getQuads(state, side, rand));
+//        }
+//        if (isOn) {
+//            tmp.addAll(blade.getQuads(state, side, rand));
+//        }
+//
         if (hasCore) {
-            tmp.addAll(core.getQuads(state, side, rand));
+            if (isOn) {
+                return swordOn;
+            } else {
+                return handleCore;
+            }
         }
-        if (isOn) {
-            tmp.addAll(blade.getQuads(state, side, rand));
-        }
-        return tmp;
+        return handleBare;
     }
 }

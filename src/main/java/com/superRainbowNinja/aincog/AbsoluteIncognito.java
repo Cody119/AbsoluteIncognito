@@ -8,6 +8,7 @@ import com.superRainbowNinja.aincog.proxys.CommonProxy;
 import com.superRainbowNinja.aincog.refrence.Reference;
 import com.superRainbowNinja.aincog.server.DebugCommand;
 import net.minecraft.client.Minecraft;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -42,44 +43,6 @@ public class AbsoluteIncognito {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        ArcFurnaceLogic.RecipeRegistry.add(new ArcFurnaceLogic.ArcFurnaceRecipe() {
-            @Override
-            public boolean check(IInventory tile) {
-                int count = 4;
-                for (int i = 0; i < tile.getSizeInventory(); i++) {
-                    ItemStack stack = tile.getStackInSlot(i);
-                    if (stack != null && stack.getItem() == Items.REDSTONE) {
-                        count -= Math.min(stack.stackSize, count);
-                    }
-                    if (count == 0) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public FluidStack getOutput() {
-                return new FluidStack(FluidRegistry.getFluid(AIncogData.GREEN_CRYSTAL_FLUID.name), 500);
-            }
-
-            @Override
-            public void consume(IInventory tile) {
-                int count = 4;
-                for (int i = 0; i < tile.getSizeInventory(); i++) {
-                    ItemStack stack = tile.getStackInSlot(i);
-                    if (stack != null && stack.getItem() == Items.REDSTONE) {
-                        int tmp = Math.min(stack.stackSize, count);
-                        count -= tmp;
-                        tile.decrStackSize(i, tmp);
-                    }
-                    if (count == 0) {
-                        return;
-                    }
-                }
-            }
-        });
-
         AIncogData.intiStatics();
 
         MinecraftForge.EVENT_BUS.register(handle);

@@ -45,8 +45,9 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
 
     public static PropertyInteger AGE = PropertyInteger.create("age", 0, 3);
     public final int color;
+    public final Item drop;
 
-    public CrystalOre(String name, int colorIn) {
+    public CrystalOre(String name, int colorIn, Item dropIn) {
         super(name, Material.ROCK);
         setTickRandomly(true);
         setDefaultState(blockState.getBaseState().withProperty(AGE, 0));
@@ -54,6 +55,7 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
         setResistance(5.0F);
         setSoundType(SoundType.STONE);
         color = colorIn;
+        drop = dropIn;
     }
 
     private int getAge(IBlockState state) {
@@ -63,7 +65,7 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
     @Nullable
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return getAge(state) == 3 ? this.item : Item.getItemFromBlock(Blocks.COBBLESTONE);
+        return getAge(state) == 3 ? this.drop : Item.getItemFromBlock(Blocks.COBBLESTONE);
     }
 
     @Override
@@ -83,7 +85,6 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        System.out.println(getAge(state));
         return false;
     }
 

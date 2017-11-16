@@ -257,17 +257,19 @@ public class PoweredWeapon extends AIItemBase {
 
     @Override
     public boolean onEntityItemUpdate(net.minecraft.entity.item.EntityItem entityItem) {
-        updateWeaponInfo(entityItem.getEntityItem(), entityItem.getEntityWorld());
+        if (!entityItem.getEntityWorld().isRemote) {
+            updateWeaponInfo(entityItem.getEntityItem(), entityItem.getEntityWorld());
+        }
         return false;
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-        updateWeaponInfo(itemStackIn, worldIn);
         IPoweredWeaponCap cap = IPoweredWeaponCap.getCap(itemStackIn);
         //the gui will not be activated when the word is in the offhand, could change but i dont think its worth it?
         if (playerIn.isSneaking() && hand == EnumHand.MAIN_HAND && !cap.weaponIsOn()) {
             if (!worldIn.isRemote) {
+                updateWeaponInfo(itemStackIn, worldIn);
                 //PacketHandler.sendTo((EntityPlayerMP) playerIn, new InventoryUpdate(itemStackIn, playerIn.inventory.currentItem));
                 playerIn.openGui(AbsoluteIncognito.instance, GuiHandler.WEAPON_GUI, worldIn, 0, 0, 0);
             }

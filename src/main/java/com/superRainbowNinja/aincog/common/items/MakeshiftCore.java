@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 /**
  * Created by SuperRainbowNinja on 7/12/2016.
  */
-public class MakeshiftCore extends BasicCore {
+public class MakeshiftCore extends CoreItem {
     public MakeshiftCore() {
         super("makeshift_core");
     }
@@ -28,7 +28,7 @@ public class MakeshiftCore extends BasicCore {
 
     @Override
     public ICore.CoreType getCoreType(ItemStack core) {
-        return ICore.CoreType.BASIC;
+        return CoreType.PITIFUL;
     }
 
     @Override
@@ -56,6 +56,11 @@ public class MakeshiftCore extends BasicCore {
 
     @Override
     public float getSpeed(ItemStack core) {
+        return 0.5f;
+    }
+
+    @Override
+    public float getStrength(ItemStack stack) {
         return 0.5f;
     }
 }

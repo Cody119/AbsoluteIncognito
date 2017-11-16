@@ -47,6 +47,7 @@ public enum MachineLogicRegistry {
         */
         register(new GeneratorLogic.Provider());
         register(new ArcFurnaceLogic.Provider());
+        register(new OreFormerLogic.Provider());
     }
 
     public void register(IMachineLogicProvider provider) {

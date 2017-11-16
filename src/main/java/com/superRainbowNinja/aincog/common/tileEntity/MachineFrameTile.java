@@ -67,10 +67,13 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     //this is undefined if locked is false (generally should be null in that scenario)
     private IMachineLogic logic;
     //should only be used on the server side, indicates if the machine received or sent rf this tick, if it did it cannot send rf this tick
-    //private boolean receivedOrSent; //if energy was recived or sent this tick (only used to limit energy flow, not for any complicated internal stuff)
+    //private boolean receivedOrSent;
+
+
     //dosent need 2 be saved, used on server side to denote the need for a full render update
     private boolean vDirty = false;
     private boolean rfUpdate = false;
+    private boolean dirtyInv = false;
 
     public enum BatteryBehaviour {
         PROVIDE,
@@ -323,6 +326,14 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         rfUpdate = true;
     }
 
+    public void markInvDirty() {
+        dirtyInv = true;
+    }
+
+    public boolean isInvDirty() {
+        return dirtyInv;
+    }
+
     public void startOp() {
         if (coreIsFunctional() && curOp != Operation.START) {
             curOp = Operation.START;
@@ -448,15 +459,16 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             logic.tick(this);
 
         if (!worldObj.isRemote) {
-            //TODO remoce battery behaviour and just make machines balance energy?
+
             if (/*batteryBehaviour != BatteryBehaviour.ACCEPT &&*/ EnergyUtils.sendEnergyToSides(getWorld(), getPos(), energy, MAX_RF_SEND)) {
                 markRfUpdate();
             }
             //receivedOrSent = false;
 
-            if (vDirty) {
+            if (vDirty || dirtyInv) {
                 PacketHandler.sendToLoaded(getWorld(), getPos(), new BlockRenderUpdater(this));
                 vDirty = false;
+                dirtyInv = false;
                 rfUpdate = false;
                 markDirty();
             } else if (rfUpdate) {
@@ -521,13 +533,15 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     public ItemStack getStackInSlot(int index) {
         return inv[index];
     }
-//TODO seprate update for stack lose? does that need 2 be updated?
+
     @Nullable
     @Override
     public ItemStack decrStackSize(int index, int count) {
         ItemStack ret = inv[index].splitStack(count);
         if (inv[index].stackSize == 0) {
             removeStack(index);
+        } else {
+            markInvDirty();
         }
         return ret;
     }
@@ -542,21 +556,13 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     private void removeStack(int slot) {
         inv[slot] = null;
-        markVisualDirty();
+        markInvDirty();
     }
 //TODO separate update if just the stack size changes?
     @Override
     public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
-        if (inv[index] == null) {
-            if (stack != null) {
-                markVisualDirty();
-            }
-        } else if (stack != null) {
-            if (stack.getItem() != inv[index].getItem()) {
-                markVisualDirty();
-            }
-        }
         inv[index] = stack;
+        markInvDirty();
     }
 
     @Override
@@ -685,7 +691,6 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
                     (tile, operation) -> tile.curOp = operation != null ? operation : Operation.NOP, Operation.values()),
             //TODO this only really needs to exsist client side, maybe make it finish at pos 0? then it dosent need 2 be synced
             //new IntegerHandle<>(MachineInfo.KEY_CORE_ANGLE, MachineFrameTile::getCoreAngle, (tile, integer) -> {if (integer != -1) tile.coreAngle = integer;})
-            //TODO core speed
             //TODO call this in onLoad?
             new Instruction<>("PostDeserialize", (tile) -> {if (tile.locked) tile.logic.postDeserialize(tile);})
     );
