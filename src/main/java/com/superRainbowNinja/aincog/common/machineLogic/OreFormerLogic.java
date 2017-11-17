@@ -294,6 +294,7 @@ public class OreFormerLogic extends FluidLogic {
         return SLOTS;
     }
 
+
     public static final class Provider implements IMachineLogicProvider {
 
         @Override
