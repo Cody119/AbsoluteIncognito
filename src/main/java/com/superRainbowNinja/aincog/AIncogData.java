@@ -13,6 +13,7 @@ import com.superRainbowNinja.aincog.common.machineLogic.OreFormerLogic;
 import com.superRainbowNinja.aincog.proxys.CommonProxy;
 import com.superRainbowNinja.aincog.refrence.OreDictNames;
 import com.superRainbowNinja.aincog.refrence.Reference;
+import com.superRainbowNinja.aincog.util.AssortedUtil;
 import com.superRainbowNinja.aincog.util.EnumPosition;
 import com.superRainbowNinja.aincog.util.MathUtil;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -25,6 +26,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -208,10 +210,10 @@ public class AIncogData {
         GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.BLUE_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.BLUE_CRYSTAL, 'R', "ingotGold"));
         GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.BLUE_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.BLUE_CRYSTAL, 'R', "ingotGold"));
 
-        OreFormerLogic.addRecipe(FluidRegistry.getFluid(WHITE_CRYSTAL_FLUID.name), WHITE_CRYSTAL_ORE.getDefaultState());
-        OreFormerLogic.addRecipe(FluidRegistry.getFluid(GREEN_CRYSTAL_FLUID.name), GREEN_CRYSTAL_ORE.getDefaultState());
-        OreFormerLogic.addRecipe(FluidRegistry.getFluid(BLUE_CRYSTAL_FLUID.name), BLUE_CRYSTAL_ORE.getDefaultState());
-        OreFormerLogic.addRecipe(FluidRegistry.getFluid(RED_CRYSTAL_FLUID.name), RED_CRYSTAL_ORE.getDefaultState());
+        OreFormerLogic.addRecipe(AssortedUtil.fluidStack(WHITE_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), WHITE_CRYSTAL_ORE.getDefaultState());
+        OreFormerLogic.addRecipe(AssortedUtil.fluidStack(GREEN_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), GREEN_CRYSTAL_ORE.getDefaultState());
+        OreFormerLogic.addRecipe(AssortedUtil.fluidStack(BLUE_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), BLUE_CRYSTAL_ORE.getDefaultState());
+        OreFormerLogic.addRecipe(AssortedUtil.fluidStack(RED_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), RED_CRYSTAL_ORE.getDefaultState());
 
         ArcFurnaceLogic.RecipeRegistry.add(new FluidStack(FluidRegistry.getFluid(AIncogData.WHITE_CRYSTAL_FLUID.name), 500),
                 new ItemStack(Items.REDSTONE, 16),

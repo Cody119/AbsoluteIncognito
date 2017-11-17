@@ -2,7 +2,6 @@ package com.superRainbowNinja.aincog.common.machineLogic;
 
 import com.superRainbowNinja.aincog.AIncogData;
 import com.superRainbowNinja.aincog.client.models.tileEntityRenders.MachineFrameRender;
-import com.superRainbowNinja.aincog.common.blocks.MachineFrame;
 import com.superRainbowNinja.aincog.common.capabilites.LockableTankImp;
 import com.superRainbowNinja.aincog.common.items.IMachineComponent;
 import com.superRainbowNinja.aincog.common.items.TankComponent;
@@ -11,6 +10,7 @@ import com.superRainbowNinja.aincog.util.LogHelper;
 import com.superRainbowNinja.aincog.util.Operation;
 import io.netty.buffer.ByteBuf;
 import javafx.util.Pair;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -23,6 +23,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
@@ -40,36 +41,98 @@ public class OreFormerLogic extends FluidLogic {
     public static final int TIME_PER_CHECK = 20;
     public static final int FLUID_PER_ORE = 500;
     public static final int RANGE = 1;
-    public static final float CHANCE = 2.0f;//1f/(27*2);
+    public static final double CHANCE = 2.0f;//1f/(27*2);
     private int progress = 0;
 
     private int getRfPerTick(MachineFrameTile tile) {
         return (int) (RF_PER_TICK / tile.getCore().getEfficiency(tile.getCoreStack()));
     }
 
-    private static ArrayList<Pair<Fluid, IBlockState>> recipes = new ArrayList<>(3);
+    //private static ArrayList<Pair<Fluid, IBlockState>> recipes = new ArrayList<>(3);
+    private static ArrayList<Pair<Fluid, IRecipe>> recipes = new ArrayList<>(3);
 
-    public static interface Recipe {
-//TODO recipe's
-
+    public interface IRecipe {
         Fluid getFluid();
-        boolean check(MachineFrameTile tile, FluidStack fluid);
-        FluidStack consume(MachineFrame tile, FluidStack fluid);
+        double getProbability();
+        RecipeResult checkAndConsume(MachineFrameTile tile, OreFormerLogic logic, BlockPos pos);
+
+        boolean checkFluidStack(FluidStack fluidStack);
     }
 
-    public static Boolean addRecipe(Fluid fluid, IBlockState state) {
-        if (fluid == null || state == null) {
+    public static class SimpleRecipe implements IRecipe {
+
+        private FluidStack fluidStack;
+        private IBlockState initalState;
+        private IBlockState finalState;
+        private double prob;
+
+        public SimpleRecipe(FluidStack fluidStackIn, IBlockState initalStateIn, IBlockState finalStateIn) {
+            this(fluidStackIn, initalStateIn, finalStateIn, CHANCE);
+        }
+
+        public SimpleRecipe(FluidStack fluidStackIn, IBlockState initalStateIn, IBlockState finalStateIn, double probIn) {
+            initalState = initalStateIn;
+            fluidStack = fluidStackIn;
+            finalState = finalStateIn;
+            prob = probIn;
+        }
+
+        @Override
+        public Fluid getFluid() {
+            return fluidStack.getFluid();
+        }
+
+        @Override
+        public double getProbability() {
+            return prob;
+        }
+
+        @Override
+        public RecipeResult checkAndConsume(MachineFrameTile tile, OreFormerLogic logic, BlockPos pos) {
+            if (tile.getWorld().getBlockState(pos) == initalState) {
+                FluidStack test = logic.tank.drain(fluidStack, false);
+                if (fluidStack.isFluidStackIdentical(test)) {
+                    logic.tank.drain(fluidStack, true);
+                    tile.getWorld().setBlockState(pos, finalState);
+                    return RecipeResult.Continue;
+                }
+            }
+            return RecipeResult.Failed;
+        }
+
+        @Override
+        public boolean checkFluidStack(FluidStack fluidStack) {
+            return fluidStack.amount >= FLUID_PER_ORE;
+        }
+    }
+
+    enum RecipeResult {
+        Failed, Stop, Continue
+    }
+
+    public static boolean addRecipe(FluidStack fluidStack, IBlockState stateF) {
+        return addRecipe(fluidStack, Blocks.STONE.getDefaultState(), stateF);
+    }
+
+    public static boolean addRecipe(FluidStack fluidStack, IBlockState stateI, IBlockState stateF) {
+        return addRecipe(new SimpleRecipe(fluidStack, stateI, stateF));
+    }
+
+    public static boolean addRecipe(IRecipe recipe) {
+        if (recipe == null) {
             LogHelper.errorLog("Tried to add null fluid recipe");
             return false;
         } else {
-            recipes.add(new Pair<>(fluid, state));
+            Fluid fluid = recipe.getFluid();
+            recipes.add(new Pair<>(fluid, recipe));
             return true;
         }
     }
 
-    public static IBlockState getRecipe(Fluid fluid) {
-        for (Pair<Fluid, IBlockState> p : recipes) {
-            if (fluid == p.getKey()) {
+    public static IRecipe getRecipe(FluidStack fluidStack) {
+        Fluid fluid = fluidStack.getFluid();
+        for (Pair<Fluid, IRecipe> p : recipes) {
+            if (fluid == p.getKey() && p.getValue().checkFluidStack(fluidStack)) {
                 return p.getValue();
             }
         }
@@ -79,13 +142,13 @@ public class OreFormerLogic extends FluidLogic {
     @Override
     public void tick(MachineFrameTile tile) {
         if (!tile.getWorld().isRemote) {
-            FluidStack fluidStack = tank.drain(FLUID_PER_ORE, false);
+            IFluidTankProperties[] pr = tank.getTankProperties();
+            FluidStack fluidStack =  pr != null && pr.length != 0 ? pr[0].getContents() : null;
             int rfPerTick;
-            IBlockState result;
-            if (fluidStack != null &&
-                    fluidStack.amount >= FLUID_PER_ORE &&
-                    tile.getEnergyStored(null) > (rfPerTick = getRfPerTick(tile)) &&
-                    (result = getRecipe(fluidStack.getFluid())) != null
+            IRecipe recipe;
+            if (tile.getEnergyStored(null) > (rfPerTick = getRfPerTick(tile)) &&
+                    fluidStack != null &&
+                    (recipe = getRecipe(fluidStack)) != null
                     ) {
                 if (tile.getCurOp() != Operation.START) {
                     tile.startOp();
@@ -94,24 +157,33 @@ public class OreFormerLogic extends FluidLogic {
                 tile.getEnergy().extractEnergy(rfPerTick, false);
 
                 if (progress == (TIME_PER_CHECK - 1)) {
-                    float chance = CHANCE * tile.getCore().getEfficiency(tile.getCoreStack());
                     Random r = new Random();
                     BlockPos pos = tile.getPos();
-//
+                    double chance = recipe.getProbability() * tile.getCore().getEfficiency(tile.getCoreStack());
+
                     endLoop:
                     for (int x = pos.getX() - RANGE; x <= pos.getX() + RANGE; x++) {
                         for (int z = pos.getZ() - RANGE; z <= (pos.getZ() + RANGE); z++) {
                             for (int y = pos.getY() - (2 * RANGE) - 1; y <= pos.getY()-1; y++) {
-                                if (r.nextFloat() <= chance && tile.getWorld().getBlockState(new BlockPos(x, y, z)).getBlock() == Blocks.STONE) {
-                                    tile.getWorld().setBlockState(new BlockPos(x, y, z), result);
-                                    tank.drain(FLUID_PER_ORE, true);
-                                    LogHelper.infoLog("change " + LogHelper.getPosString(new BlockPos(x,y,z)));
-                                    fluidStack = tank.drain(FLUID_PER_ORE, false);
-                                    if (fluidStack == null ||
-                                            fluidStack.amount < FLUID_PER_ORE ||
-                                            (result = getRecipe(fluidStack.getFluid())) == null
-                                            ) {
-                                        break endLoop;
+                                if (r.nextDouble() <= chance) {// && tile.getWorld().getBlockState(new BlockPos(x, y, z)).getBlock() == Blocks.STONE) {
+                                    RecipeResult result = recipe.checkAndConsume(tile, this, new BlockPos(x, y, z));
+                                    //tile.getWorld().setBlockState(new BlockPos(x, y, z), result);
+                                    //tank.drain(FLUID_PER_ORE, true);
+                                    //LogHelper.infoLog("change " + LogHelper.getPosString(new BlockPos(x,y,z)));
+                                    //fluidStack = tank.drain(FLUID_PER_ORE, false);
+                                    //if (fluidStack == null ||
+                                    //        fluidStack.amount < FLUID_PER_ORE ||
+                                    //        (result = getRecipe(fluidStack.getFluid())) == null
+                                    //        ) {
+                                    switch (result) {
+                                        case Stop:
+                                            break endLoop;
+                                        case Failed:
+                                            break;
+                                        case Continue:
+                                            LogHelper.infoLog("change " + LogHelper.getPosString(new BlockPos(x,y,z)));
+                                            break;
+
                                     }
                                 }
                             }

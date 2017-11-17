@@ -1,0 +1,9 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "aincog:items/core_overlay",
+        "layer1": "aincog:items/core",
+        "layer2": "aincog:items/core_outline"
+    }
+
+}
