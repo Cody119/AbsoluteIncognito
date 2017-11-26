@@ -120,7 +120,7 @@ public class MachineFrameRender extends TileEntitySpecialRenderer<MachineFrameTi
             }
             //logic render
             if (teIn.isLocked()) {
-                teIn.getLogic().renderTileEntityAt(this, teIn, x, y, z, partialTicks, destroyStage);
+                teIn.getLogic().renderTileEntityAt(this, x, y, z, partialTicks, destroyStage);
             }
 
     }

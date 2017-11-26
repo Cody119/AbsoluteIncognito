@@ -27,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
@@ -74,6 +75,28 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     private boolean vDirty = false;
     private boolean rfUpdate = false;
     private boolean dirtyInv = false;
+
+    public boolean wrench(EntityPlayer playerIn, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        removeFrame(playerIn.getPositionVector());
+        ItemStack stack = tryRemoveComponent(hitX, hitY, hitZ);
+        if (stack != null) {
+            InvUtil.spawnItemStack(worldObj, pos, playerIn.getPositionVector(), stack);
+        }
+        return true;
+    }
+
+    private void removeFrame(Vec3d vec) {
+        if (locked) {
+            dropLock(vec);
+            dropInventory();
+            if (getCurOp() == Operation.START) {
+                stopOp();
+            }
+            locked = false;
+            resizeInv(0);
+            logic = null;
+        }
+    }
 
     public enum BatteryBehaviour {
         PROVIDE,
@@ -256,7 +279,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     private void removeCore() {
         setCore(null);
         if (locked) {
-            logic.coreRemoved(this);
+            logic.coreRemoved();
         }
         curOp = Operation.NOP;
         coreSpeed = 0;
@@ -273,7 +296,9 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
         if (heldItem != null) {
             if (trySetCore(heldItem)) {
-                playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, null);
+                if (!playerIn.isCreative()) {
+                    playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, null);
+                }
                 return true;
             }
         } else {
@@ -286,9 +311,9 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
         if (locked) {
             if (heldItem != null) {
-                logic.insertItem(this, playerIn, hand, heldItem, side, hitX, hitY, hitZ);
+                logic.insertItem(playerIn, hand, heldItem, side, hitX, hitY, hitZ);
             } else {
-                logic.removeItem(this, playerIn, side, hitX, hitY, hitZ);
+                logic.removeItem(playerIn, side, hitX, hitY, hitZ);
             }
         } else {
             //machine is not valid
@@ -430,9 +455,21 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         }
     }
 
+    public void dropLock(Vec3d vec) {
+        if (locked) {
+            InvUtil.spawnItemStack(worldObj, getPos(), vec, new ItemStack(AIncogData.MACHINE_LOCK, 1));
+        }
+    }
+
     public void dropComponents() {
         for (ItemStack stack : componentItems) {
             InventoryHelper.spawnItemStack(worldObj, pos.getX(), pos.getY(), pos.getZ(), stack);
+        }
+    }
+
+    public void dropComponents(Vec3d vec) {
+        for (ItemStack stack : componentItems) {
+            InvUtil.spawnItemStack(worldObj, getPos(), vec, stack);
         }
     }
 
@@ -456,7 +493,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     @Override
     public void update() {
         if (locked && coreIsFunctional())
-            logic.tick(this);
+            logic.tick();
 
         if (!worldObj.isRemote) {
 
@@ -478,7 +515,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             }
 
             if (locked && worldObj.getWorldTime() % 10 == 0) {
-                logic.spawnParticles(this, ((WorldServer) worldObj), pos);
+                logic.spawnParticles(((WorldServer) worldObj), pos);
             }
         }
 
@@ -558,7 +595,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         inv[slot] = null;
         markInvDirty();
     }
-//TODO separate update if just the stack size changes?
+//TODO separate update if just the thisStack size changes?
     @Override
     public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
         inv[index] = stack;

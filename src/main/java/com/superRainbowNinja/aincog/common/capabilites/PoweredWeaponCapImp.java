@@ -1,7 +1,5 @@
 package com.superRainbowNinja.aincog.common.capabilites;
 
-import com.superRainbowNinja.aincog.common.items.ICore;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -15,54 +13,50 @@ import javax.annotation.Nullable;
  *
  *
  */
-public class PoweredWeaponCapImp implements IPoweredWeaponCap, ICapabilitySerializable<NBTTagCompound> {
+public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWeaponCap {
     public static final String DIM_ID_KEY = "DIM_ID";
     public static final String REC_TIME_KEY = "REC_TIME";
     public static final String WEAPON_STATE = "WEAPON_STATE";
-    public static final String CORE_ITEM = "CORE_ITEM";
 
-    public static final String CAP_KEY = "POWERED_WEAPON_CAP";
+    public static final String POWERED_WEAPON_CAP_KEY = "POWERED_WEAPON_CAP";
 
-    long recTimeStamp = 0;
-    int dimId = 0;
-    boolean state = false;
-    ItemStack core = null;
-
-    ItemStack weapon;
-    boolean isCached;
+    private long recTimeStamp = 0;
+    private int dimId = 0;
+    private boolean state = false;
 
     public PoweredWeaponCapImp() {
-        System.out.println("error");
+        super();
     }
 
     public PoweredWeaponCapImp(ItemStack weaponIn) {
-        weapon = weaponIn;
-        isCached = false;
+        super(weaponIn);
     }
 
-    public void cacheCheck() {
-        if (!isCached) {
-            loadFromCache();
-        }
-    }
 
-    public void loadFromCache() {
-        NBTTagCompound compund = weapon.getSubCompound(CAP_KEY, true);
-        if (compund.getBoolean(CORE_ITEM)) {
-            core = ItemStack.loadItemStackFromNBT(compund);
-            if (state = compund.getBoolean(WEAPON_STATE)) {
-                recTimeStamp = compund.getLong(REC_TIME_KEY);
-                dimId = compund.getInteger(DIM_ID_KEY);
+
+//    public void cacheCheck() {
+//        if (!isCached) {
+//            loadFromCache();
+//        }
+//    }
+//
+    @Override
+    public void cache() {
+        super.cache();
+        if (core != null) {
+            NBTTagCompound compound = thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true);
+            if (state = compound.getBoolean(WEAPON_STATE)) {
+                recTimeStamp = compound.getLong(REC_TIME_KEY);
+                dimId = compound.getInteger(DIM_ID_KEY);
             }
         }
-        isCached = true;
     }
 
     @Override
     public void setRecentTimeStamp(long time) {
         cacheCheck();
         recTimeStamp = time;
-        weapon.getSubCompound(CAP_KEY, true).setLong(REC_TIME_KEY, time);
+        thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setLong(REC_TIME_KEY, time);
     }
 
     @Override
@@ -75,7 +69,7 @@ public class PoweredWeaponCapImp implements IPoweredWeaponCap, ICapabilitySerial
     public void setDimensionId(int id) {
         cacheCheck();
         dimId = id;
-        weapon.getSubCompound(CAP_KEY, true).setInteger(DIM_ID_KEY, id);
+        thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setInteger(DIM_ID_KEY, id);
     }
 
     @Override
@@ -88,7 +82,7 @@ public class PoweredWeaponCapImp implements IPoweredWeaponCap, ICapabilitySerial
     public void setState(boolean cur) {
         cacheCheck();
         state = cur;
-        weapon.getSubCompound(CAP_KEY, true).setBoolean(WEAPON_STATE, cur);
+        thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setBoolean(WEAPON_STATE, cur);
     }
 
     @Override
@@ -97,79 +91,81 @@ public class PoweredWeaponCapImp implements IPoweredWeaponCap, ICapabilitySerial
         return state;
     }
 
-    @Override
-    public boolean setCoreDamage(int dmg) {
-        cacheCheck();
-        if (core != null && ((ICore) core.getItem()).setCoreDamage(core, dmg)) {
-            core.writeToNBT(weapon.getSubCompound(CAP_KEY, true));
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public int getCoreMaxDamage() {
-        cacheCheck();
-        return core != null ? ((ICore)core.getItem()).getMaxCoreDamage(core) : 0;
-    }
-
-    @Override
-    public int getCoreDamage() {
-        cacheCheck();
-        return core != null ? ((ICore)core.getItem()).getCoreDamage(core) : 0;
-    }
-
-    @Override
-    public boolean trySetCore(ItemStack stack) {
-        cacheCheck();
-        if (!hasCore() && stack != null && stack.getItem() instanceof ICore) {
-            core = stack.copy();
-            core.writeToNBT(weapon.getSubCompound(CAP_KEY, true)).setBoolean(CORE_ITEM, true);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void loseCore() {
-        core = null;
-        weapon.getSubCompound(CAP_KEY, true).setBoolean(CORE_ITEM, false);
-    }
-
-    @Override
-    public void setCore(ItemStack stack) {
-        cacheCheck();
-        if (stack != null && stack.getItem() instanceof ICore) {
-            core = stack.copy();
-            core.writeToNBT(weapon.getSubCompound(CAP_KEY, true)).setBoolean(CORE_ITEM, true);
-        } else {
-            throw new RuntimeException("Tried to set invalid core into power weapon cap: " + stack);
-        }
-    }
-
-    @Nullable
-    @Override
-    public ItemStack getCoreItemStack() {
-        cacheCheck();
-        return core;
-    }
-
-    @Nullable
-    @Override
-    public ICore getCoreItem() {
-        cacheCheck();
-        return core == null ? null : (ICore) core.getItem();
-    }
+//    @Override
+//    public boolean setCoreDamage(int dmg) {
+//        cacheCheck();
+//        if (core != null && ((ICore) core.getItem()).setCoreDamage(core, dmg)) {
+//            core.writeToNBT(weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true));
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    @Override
+//    public int getCoreMaxDamage() {
+//        cacheCheck();
+//        return core != null ? ((ICore)core.getItem()).getMaxCoreDamage(core) : 0;
+//    }
+//
+//    @Override
+//    public int getCoreDamage() {
+//        cacheCheck();
+//        return core != null ? ((ICore)core.getItem()).getCoreDamage(core) : 0;
+//    }
+//
+//    @Override
+//    public boolean trySetCore(ItemStack thisStack, boolean simulate) {
+//        cacheCheck();
+//        if (!hasCore() && thisStack != null && thisStack.getItem() instanceof ICore) {
+//            if (!simulate){
+//                core = thisStack.copy();
+//                core.writeToNBT(weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true)).setBoolean(CORE_ITEM, true);
+//            }
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    @Override
+//    public void loseCore() {
+//        core = null;
+//        weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setBoolean(CORE_ITEM, false);
+//    }
+//
+//    @Override
+//    public void setCore(ItemStack thisStack) {
+//        cacheCheck();
+//        if (thisStack != null && thisStack.getItem() instanceof ICore) {
+//            core = thisStack.copy();
+//            core.writeToNBT(weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true)).setBoolean(CORE_ITEM, true);
+//        } else {
+//            throw new RuntimeException("Tried to set invalid core into power weapon cap: " + thisStack);
+//        }
+//    }
+//
+//    @Nullable
+//    @Override
+//    public ItemStack getCoreItemStack() {
+//        cacheCheck();
+//        return core;
+//    }
+//
+//    @Nullable
+//    @Override
+//    public ICore getCoreItem() {
+//        cacheCheck();
+//        return core == null ? null : (ICore) core.getItem();
+//    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == POWERED_WEAPON_CAP;
+        return capability == POWERED_WEAPON_CAP || super.hasCapability(capability, facing);
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        return (capability == POWERED_WEAPON_CAP) ? (T) this : null;
+        return (capability == POWERED_WEAPON_CAP) ? (T) this : super.getCapability(capability, facing);
     }
 
     @Override

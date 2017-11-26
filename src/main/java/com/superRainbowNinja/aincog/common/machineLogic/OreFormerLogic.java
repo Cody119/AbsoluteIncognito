@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.Fluid;
@@ -34,6 +35,7 @@ import java.util.Random;
  * Created by SuperRainbowNinja on 3/12/2016.
  *  recipes added in AIncogData
  *
+ * TODO arraylists for each registered liquid
  */
 public class OreFormerLogic extends FluidLogic {
     private static final String NAME = "ore_former_logic";
@@ -140,7 +142,7 @@ public class OreFormerLogic extends FluidLogic {
     }
 
     @Override
-    public void tick(MachineFrameTile tile) {
+    public void tick() {
         if (!tile.getWorld().isRemote) {
             IFluidTankProperties[] pr = tank.getTankProperties();
             FluidStack fluidStack =  pr != null && pr.length != 0 ? pr[0].getContents() : null;
@@ -222,21 +224,21 @@ public class OreFormerLogic extends FluidLogic {
     }
 
     @Override
-    public void insertItem(MachineFrameTile te, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (FluidUtil.tryFillContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory), Integer.MAX_VALUE,  playerIn))
-            te.markVisualDirty();
+            tile.markVisualDirty();
         else if (FluidUtil.tryEmptyContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory), Integer.MAX_VALUE, playerIn)) {
-            te.markVisualDirty();
+            tile.markVisualDirty();
         }
     }
 
     @Override
-    public void removeItem(MachineFrameTile te, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {}
+    public void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {}
 
     @Override
-    public void renderTileEntityAt(MachineFrameRender r, MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage) {
-//        ItemStack stack = teIn.getStackInSlot(0);
-//        if (stack != null) {
+    public void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage) {
+//        ItemStack thisStack = teIn.getStackInSlot(0);
+//        if (thisStack != null) {
 //            GlStateManager.pushMatrix();
 //            GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
 //            GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);
@@ -247,20 +249,20 @@ public class OreFormerLogic extends FluidLogic {
 //                    + ((double) partialTicks) * val
 //            );
 //            GlStateManager.rotate(d0, 0, 1, 0);
-//            Minecraft.getMinecraft().getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
+//            Minecraft.getMinecraft().getRenderItem().renderItem(thisStack, ItemCameraTransforms.TransformType.NONE);
 //            GlStateManager.popMatrix();
 //        }
     }
 
     @Override
-    public void spawnParticles(MachineFrameTile tile, WorldServer worldServer, BlockPos pos) {
-//        if (tile.getCurOp() != Operation.NOP) {
-//            worldServer.spawnParticle(EnumParticleTypes.REDSTONE, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 10, 0.05, 0.05, 0.05, 0.0D);//, Item.getIdFromItem(AIncogData.MAKESHIFT_CORE));
-//        }
+    public void spawnParticles(WorldServer worldServer, BlockPos pos) {
+        //if (tile.getCurOp() != Operation.NOP) {
+        //    worldServer.spawnParticle(EnumParticleTypes.DRIP_LAVA, pos.getX()+0.5, pos.getY()-0.5, pos.getZ()+0.5, 1, 0D, 0D, 0D, 0D);//, Item.getIdFromItem(AIncogData.MAKESHIFT_CORE));
+        //}
     }
 
     @Override
-    public void coreRemoved(MachineFrameTile teIn) {
+    public void coreRemoved() {
         //rfMiniBuf = 0; //the operation will be auto wipped, we just need 2 worry about internals of this class
     }
 
@@ -287,7 +289,7 @@ public class OreFormerLogic extends FluidLogic {
         return compound;
     }
 
-    public static final int[] SLOTS = new int[]{0};
+    public static final int[] SLOTS = new int[0];
 
     @Override
     public int[] getSlotsForFace(EnumFacing side) {

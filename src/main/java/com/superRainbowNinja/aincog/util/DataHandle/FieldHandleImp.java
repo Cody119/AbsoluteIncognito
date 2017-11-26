@@ -48,7 +48,7 @@ public abstract class FieldHandleImp<T, R> implements IFieldHandle<T> {
     }
 
     @Override
-    public void readFromCache(Object data, T object) {
+    public void read(Object data, T object) {
         //this should be prtty safe provided subclasses are only used in a data bundle
         setter.accept(object, (R) data);
     }

@@ -38,8 +38,8 @@ public class AIItemBase extends Item implements IRegistryEntry{
 
 /*
     @Override
-    public net.minecraftforge.common.capabilities.ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
-        if (this == stack.getItem()) {
+    public net.minecraftforge.common.capabilities.ICapabilityProvider initCapabilities(ItemStack thisStack, NBTTagCompound nbt) {
+        if (this == thisStack.getItem()) {
             System.out.println("Item Refresh");
         } else {
             System.out.println("Copy");

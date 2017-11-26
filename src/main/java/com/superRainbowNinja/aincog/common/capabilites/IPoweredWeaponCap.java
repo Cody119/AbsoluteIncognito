@@ -13,9 +13,9 @@ import javax.annotation.Nullable;
  * Created by SuperRainbowNinja on 9/10/2016.
  *
  */
-public interface IPoweredWeaponCap {
+public interface IPoweredWeaponCap extends ICoreContainer{
     @CapabilityInject(IPoweredWeaponCap.class)
-    public Capability<IPoweredWeaponCap> POWERED_WEAPON_CAP = null;
+    Capability<IPoweredWeaponCap> POWERED_WEAPON_CAP = null;
 
     //Start of methods to implement
     void setRecentTimeStamp(long time);
@@ -27,20 +27,7 @@ public interface IPoweredWeaponCap {
     void setState(boolean cur);
     boolean getState();
 
-    //returning true indicates the core is broken (not out of energy, broken)
-    boolean setCoreDamage(int dmg);
-    int getCoreMaxDamage();
-    int getCoreDamage();
 
-    boolean trySetCore(ItemStack stack);
-    void loseCore();
-
-    void setCore(ItemStack stack);
-
-    @Nullable
-    ItemStack getCoreItemStack();
-    @Nullable
-    ICore getCoreItem();
 
     static IPoweredWeaponCap getCap(ItemStack stack) {
         return stack.getCapability(POWERED_WEAPON_CAP, EnumFacing.DOWN);
@@ -62,12 +49,4 @@ public interface IPoweredWeaponCap {
         setState(false);
     }
 
-    static boolean hasCore(ItemStack stack) {
-        return stack.getCapability(POWERED_WEAPON_CAP, EnumFacing.DOWN).hasCore();
-    }
-
-    default boolean hasCore() {
-        return getCoreItemStack() != null;
-        //return true;
-    }
 }

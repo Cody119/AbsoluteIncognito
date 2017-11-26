@@ -51,7 +51,7 @@ public class Instruction<T> implements IFieldHandle<T> {
     }
 
     @Override
-    public void readFromCache(Object data, T object) {
+    public void read(Object data, T object) {
         func.accept(object);
     }
 }

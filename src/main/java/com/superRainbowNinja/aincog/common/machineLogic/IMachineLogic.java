@@ -25,8 +25,10 @@ import javax.annotation.Nullable;
  * Created by SuperRainbowNinja on 2/12/2016.
  */
 public interface IMachineLogic extends ICapabilityProvider {
+    //Logic should store tile
+    MachineFrameTile getTile();
     //called every tick once this logic is installed and there is a valid core
-    void tick(MachineFrameTile tile);
+    void tick();
     //called after the tile entity has installed this logic, giving a chance 2 set an inv size and such
     //it is not called when the machine is reloaded
     void initMachine(MachineFrameTile tile);
@@ -34,17 +36,17 @@ public interface IMachineLogic extends ICapabilityProvider {
     String getName();
     /*Note these next 2 methods don't have 2 do insertion/removal, its just what they generally do*/
     //called when player attempts to insert an item
-    void insertItem(MachineFrameTile te, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ);
+    void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ);
     //called when a player clicks with an empty hand (general a remove attempt)
-    void removeItem(MachineFrameTile te, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ);
+    void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ);
     //get a chance 2 render additional stuff
-    void renderTileEntityAt(MachineFrameRender r, MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage);
+    void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage);
     //called every 10 ticks, food interval for spawning particles (server side)
-    void spawnParticles(MachineFrameTile tile, WorldServer worldServer, BlockPos pos);
+    void spawnParticles(WorldServer worldServer, BlockPos pos);
     //called if the core breaks/is removed (note could be called whenever the core is damaged i.e. within another logic method)
-    void coreRemoved(MachineFrameTile teIn);
+    void coreRemoved();
     //called after Deserialization (from nbt or byte buffer)
-    default void postDeserialize(MachineFrameTile tile) {}
+    void postDeserialize(MachineFrameTile tile);
 
     //only need these if
     //used when sending render info, so if the client doesn't need info, don't need 2 serialize it
@@ -78,30 +80,36 @@ public interface IMachineLogic extends ICapabilityProvider {
 
     /* temp */
     IMachineLogic CLIENT_MACHINE = new IMachineLogic() {
+        MachineFrameTile tile;
+
         @Override
-        public void tick(MachineFrameTile tile) {}
+        public MachineFrameTile getTile() { return tile; }
         @Override
-        public void initMachine(MachineFrameTile tile) {}
+        public void tick() {}
+        @Override
+        public void initMachine(MachineFrameTile tileIn) { tile = tileIn; }
         @Override
         public String getName() {return "CLIENT_MACHINE";}
         @Override
-        public void insertItem(MachineFrameTile te, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {}
+        public void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {}
         @Override
-        public void removeItem(MachineFrameTile te, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {}
+        public void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {}
         @Override
-        public void renderTileEntityAt(MachineFrameRender r, MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage) {}
+        public void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage) {}
         @Override
-        public void spawnParticles(MachineFrameTile tile, WorldServer worldServer, BlockPos pos) {}
+        public void spawnParticles(WorldServer worldServer, BlockPos pos) {}
         @Override
-        public void coreRemoved(MachineFrameTile teIn) {}
+        public void coreRemoved() {}
+        @Override
+        public void postDeserialize(MachineFrameTile tileIn) { tile = tileIn; }
         @Override
         public void serialize(ByteBuf buf) {}
         @Override
         public void deserialize(ByteBuf buf) {}
         @Override
-        public IMachineLogic readFromNBT(NBTTagCompound compound) {return null;}
+        public IMachineLogic readFromNBT(NBTTagCompound compound) {return this;}
         @Nullable
         @Override
-        public NBTTagCompound writeToNBT(NBTTagCompound compound) {return null;}
+        public NBTTagCompound writeToNBT(NBTTagCompound compound) {return compound;}
     };
 }

@@ -37,6 +37,7 @@ import java.util.function.BiFunction;
  */
 public class ArcFurnaceLogic extends FluidLogic {
     public static int RF_PER_TICK = 20;
+    public static int DEFAULT_SPEED = 80;
 
     public static class RecipeRegistry {
 
@@ -48,6 +49,10 @@ public class ArcFurnaceLogic extends FluidLogic {
 
         public static void add (FluidStack output, ItemStack ... recipe) {
             add(new Recipe(output, recipe));
+        }
+
+        public static void add (FluidStack output, int time, ItemStack ... recipe) {
+            add(new Recipe(output, time, recipe));
         }
 
         public static void add (FluidStack output, BiFunction<ItemStack, ItemStack, Boolean> itemComp, ItemStack ... recipe) {
@@ -68,7 +73,7 @@ public class ArcFurnaceLogic extends FluidLogic {
 
     public interface ArcFurnaceRecipe {
         boolean check(IInventory stacks);
-        default int processTime() {return 80;}
+        default int processTime() {return DEFAULT_SPEED;}
         FluidStack getOutput();
         //TODO return output?
         void consume(IInventory tile);
@@ -78,15 +83,30 @@ public class ArcFurnaceLogic extends FluidLogic {
         private ItemStack[] rStacks;
         private BiFunction<ItemStack, ItemStack, Boolean> compare;
         private FluidStack output;
+        private int time;
 
         public Recipe(FluidStack outputIn, ItemStack ... stacks) {
-            this(outputIn, (a,b) -> a.getItem() == b.getItem() && (a.isItemStackDamageable() || a.getMetadata() == b.getMetadata()), stacks);
+            this(outputIn, DEFAULT_SPEED, stacks);
         }
 
-        public Recipe(FluidStack outputIn, BiFunction<ItemStack, ItemStack, Boolean> compareIn, ItemStack ... stacks) {
+        public Recipe(FluidStack outputIn, int timeIn, ItemStack[] stacks) {
+            this(outputIn, timeIn, (a,b) -> a.getItem() == b.getItem() && (a.isItemStackDamageable() || a.getMetadata() == b.getMetadata()), stacks);
+        }
+
+        public Recipe(FluidStack outputIn, BiFunction<ItemStack, ItemStack, Boolean> compareIn, ItemStack[] stacks) {
+            this(outputIn, DEFAULT_SPEED, compareIn, stacks);
+        }
+
+        public Recipe(FluidStack outputIn, int timeIn, BiFunction<ItemStack, ItemStack, Boolean> compareIn, ItemStack ... stacks) {
             rStacks = stacks;
             compare = compareIn;
             output = outputIn;
+            time = timeIn;
+        }
+
+        @Override
+        public int processTime() {
+            return time;
         }
 
         @Override
@@ -163,7 +183,7 @@ public class ArcFurnaceLogic extends FluidLogic {
 
 
     @Override
-    public void tick(MachineFrameTile tile) {
+    public void tick() {
         if (!tile.getWorld().isRemote) {
             if (progress != 0) {
                 if (curRecipe != null) {
@@ -259,33 +279,33 @@ public class ArcFurnaceLogic extends FluidLogic {
     }
 
     @Override
-    public void insertItem(MachineFrameTile te, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!FluidUtil.tryFillContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory),Integer.MAX_VALUE,  playerIn) && side != EnumFacing.DOWN && side != EnumFacing.UP) {
-            InvUtil.insertIntoInvFromPlayer(playerIn, te, getSlot(side), heldItem);
+            InvUtil.insertIntoInvFromPlayer(playerIn, tile, getSlot(side), heldItem);
             //playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem,
             //    ItemHandlerHelper.insertItemStacked(new InvWrapper(te), heldItem, false) //comparing items can be slow, so its just faster to assume it changed
             //);
         } else {
             //if (InvUtil.insertIntoInvFromPlayer(playerIn, te, 0, heldItem))
-            te.markVisualDirty();
+            tile.markVisualDirty();
         }
     }
 
     @Override
-    public void removeItem(MachineFrameTile te, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (side != EnumFacing.UP && side != EnumFacing.DOWN) {
-            ItemStack stack = te.getStackInSlot(getSlot(side));
+            ItemStack stack = tile.getStackInSlot(getSlot(side));
             if (stack != null) {
                 playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, stack);
-                te.setInventorySlotContents(getSlot(side), null);
+                tile.setInventorySlotContents(getSlot(side), null);
                 //te.markVisualDirty(); changing inv contents auto marks dirty
             }
         }
     }
 //TODO clean up
     @Override
-    public void renderTileEntityAt(MachineFrameRender r, MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage) {
-        ItemStack stack = teIn.getStackInSlot(getSlot(EnumFacing.NORTH));
+    public void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage) {
+        ItemStack stack = tile.getStackInSlot(getSlot(EnumFacing.NORTH));
         if (stack != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 12f/16f, z + 4f/16f);
@@ -295,7 +315,7 @@ public class ArcFurnaceLogic extends FluidLogic {
             GlStateManager.popMatrix();
         }
 
-        stack = teIn.getStackInSlot(getSlot(EnumFacing.SOUTH));
+        stack = tile.getStackInSlot(getSlot(EnumFacing.SOUTH));
         if (stack != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 12f/16f, z + 12f/16f);
@@ -305,7 +325,7 @@ public class ArcFurnaceLogic extends FluidLogic {
             GlStateManager.popMatrix();
         }
 
-        stack = teIn.getStackInSlot(getSlot(EnumFacing.EAST));
+        stack = tile.getStackInSlot(getSlot(EnumFacing.EAST));
         if (stack != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 12f/16f, y + 12f/16f, z + 0.5);
@@ -315,7 +335,7 @@ public class ArcFurnaceLogic extends FluidLogic {
             GlStateManager.popMatrix();
         }
 
-        stack = teIn.getStackInSlot(getSlot(EnumFacing.WEST));
+        stack = tile.getStackInSlot(getSlot(EnumFacing.WEST));
         if (stack != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 4f/16f, y + 12f/16f, z + 0.5);
@@ -327,12 +347,12 @@ public class ArcFurnaceLogic extends FluidLogic {
     }
 
     @Override
-    public void spawnParticles(MachineFrameTile tile, WorldServer worldServer, BlockPos pos) {
+    public void spawnParticles(WorldServer worldServer, BlockPos pos) {
 
     }
 
     @Override
-    public void coreRemoved(MachineFrameTile teIn) {
+    public void coreRemoved() {
         progress = 0;
         curRecipe = null;
     }

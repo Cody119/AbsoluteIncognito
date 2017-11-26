@@ -1,12 +1,17 @@
 package com.superRainbowNinja.aincog.util;
 
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -56,4 +61,25 @@ public class InvUtil {
         }
         return false;
     }
+
+    public static void spawnItemStacks(World worldIn, BlockPos pos, Vec3d to, List<ItemStack> stacks) {
+        for (ItemStack stack : stacks) {
+            spawnItemStack(worldIn, pos, to, stack);
+        }
+    }
+
+    public static void spawnItemStack(World worldIn, BlockPos pos, Vec3d to, ItemStack stack) {
+        Vec3d direction = to.subtract(new Vec3d(pos));
+        Vec3d norm = direction.normalize();
+        Vec3d spawnPos = norm.add(new Vec3d(pos));
+
+        EntityItem entityitem = new EntityItem(worldIn, spawnPos.xCoord, spawnPos.yCoord, spawnPos.zCoord, stack);
+
+        Vec3d velocity = norm.scale(direction.lengthVector()*0.5);
+        entityitem.motionX = velocity.xCoord;
+        entityitem.motionY = velocity.xCoord;
+        entityitem.motionZ = velocity.xCoord;
+        worldIn.spawnEntityInWorld(entityitem);
+    }
+
 }

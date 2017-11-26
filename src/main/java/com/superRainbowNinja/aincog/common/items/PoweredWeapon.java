@@ -2,6 +2,7 @@ package com.superRainbowNinja.aincog.common.items;
 
 import com.superRainbowNinja.aincog.AIncogData;
 import com.superRainbowNinja.aincog.AbsoluteIncognito;
+import com.superRainbowNinja.aincog.common.capabilites.ICoreContainer;
 import com.superRainbowNinja.aincog.common.containers.WeaponContainer;
 import com.superRainbowNinja.aincog.common.network.GuiHandler;
 import com.superRainbowNinja.aincog.common.capabilites.IPoweredWeaponCap;
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * model change durp if not careful with "shouldCauseReequipAnimation"
  * TODO update weapon while its in a container, just add a tick handle, and listen for the container open event
- *          -This resualts in the core not updating, sometimes the stack size goes down 2 0 as well
+ *          -This resualts in the core not updating, sometimes the thisStack size goes down 2 0 as well
  * TODO when reloading check if the loaded core is still a valid core (i.e. it still exsists ingame)
  *
  * TODO particles when core breaks
@@ -53,11 +54,11 @@ public class PoweredWeapon extends AIItemBase {
         setNoRepair();
 
         /* sorrta wanna store this somewhere as refrense, but i also dont like it here :P
-        addPropertyOverride(new ResourceLocation("on"), (stack, worldIn, entityIn) -> {
-            return swordIsOn(stack) ? 1.0f : 0.0f;
+        addPropertyOverride(new ResourceLocation("on"), (thisStack, worldIn, entityIn) -> {
+            return swordIsOn(thisStack) ? 1.0f : 0.0f;
         });
-        addPropertyOverride(new ResourceLocation("core"), (stack, worldIn, entityIn) -> {
-            return hasCore(stack) ? 1.0f : 0.0f;
+        addPropertyOverride(new ResourceLocation("core"), (thisStack, worldIn, entityIn) -> {
+            return hasCore(thisStack) ? 1.0f : 0.0f;
         });
         */
     }
@@ -72,12 +73,12 @@ public class PoweredWeapon extends AIItemBase {
     }
 
     public static ItemStack getCore(ItemStack weapon) {
-        return IPoweredWeaponCap.getCap(weapon).getCoreItemStack();
+        return ICoreContainer.getCap(weapon).getCoreItemStack();
     }
 
     public boolean trySetCore(ItemStack weapon, ItemStack core) {
-        IPoweredWeaponCap cap = IPoweredWeaponCap.getCap(weapon);
-        if (cap.trySetCore(core)) {
+        ICoreContainer cap = ICoreContainer.getCap(weapon);
+        if (cap.trySetCore(core, false)) {
             weapon.setItemDamage(cap.getCoreDamage());
             System.out.println("set core");
             return true;
@@ -87,11 +88,11 @@ public class PoweredWeapon extends AIItemBase {
 
     public void loseCore(ItemStack weapon) {
         weapon.setItemDamage(0);
-        IPoweredWeaponCap.getCap(weapon).loseCore();
+        ICoreContainer.getCap(weapon).loseCore();
     }
 
     public boolean hasCore(ItemStack stack) {
-        return IPoweredWeaponCap.getCap(stack).hasCore();
+        return ICoreContainer.hasCore(stack);
     }
 
     public boolean weaponCanActivate(ItemStack stack) {
@@ -130,7 +131,7 @@ public class PoweredWeapon extends AIItemBase {
 
     public void updateCoreFromContainer(EntityPlayer player, ItemStack weapon, WeaponContainer container) {
         if (container.isDirty() && !player.getEntityWorld().isRemote) {
-            IPoweredWeaponCap cap = IPoweredWeaponCap.getCap(weapon);
+            ICoreContainer cap = IPoweredWeaponCap.getCap(weapon);
             ItemStack core = container.getSlot(0).getStack();
             if (core == null) {
                 if (cap.hasCore()) {
@@ -171,10 +172,10 @@ public class PoweredWeapon extends AIItemBase {
     ----------------------------*/
 
     private void setCore(ItemStack weapon, ItemStack core) {
-        setCore(weapon, core, IPoweredWeaponCap.getCap(weapon));
+        setCore(weapon, core, ICoreContainer.getCap(weapon));
     }
 
-    private void setCore(ItemStack weapon, ItemStack core, IPoweredWeaponCap cap) {
+    private void setCore(ItemStack weapon, ItemStack core, ICoreContainer cap) {
         cap.setCore(core);
         weapon.setItemDamage(cap.getCoreDamage());
     }
@@ -198,7 +199,7 @@ public class PoweredWeapon extends AIItemBase {
     }
 
     //set for both core and sword, maybe make defualt imp do this as well??
-    private void setDamage(ItemStack stack, int dmg, IPoweredWeaponCap cap) {
+    private void setDamage(ItemStack stack, int dmg, ICoreContainer cap) {
         super.setDamage(stack, dmg);
         if (cap.setCoreDamage(dmg)) {
             loseCore(stack);
@@ -206,9 +207,9 @@ public class PoweredWeapon extends AIItemBase {
     }
 /*
     @Override
-    public NBTTagCompound getNBTShareTag(ItemStack stack) {
+    public NBTTagCompound getNBTShareTag(ItemStack thisStack) {
         System.out.println("test");
-        return stack.getTagCompound();
+        return thisStack.getTagCompound();
     }
 */
     /*---------------------------
@@ -241,7 +242,7 @@ public class PoweredWeapon extends AIItemBase {
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return IPoweredWeaponCap.getCap(stack).getCoreMaxDamage();
+        return ICoreContainer.getCap(stack).getCoreMaxDamage();
     }
 
     @Override
@@ -262,7 +263,7 @@ public class PoweredWeapon extends AIItemBase {
         }
         return false;
     }
-
+//TODO generifiy so i can use it for other stuff
     @Override
     public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
         IPoweredWeaponCap cap = IPoweredWeaponCap.getCap(itemStackIn);

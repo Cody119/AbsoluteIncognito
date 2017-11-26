@@ -14,5 +14,5 @@ public interface IFieldHandle<T> {
     void write(ByteBuf buf, T object);
     void read(ByteBuf buf, T object);
     Object read(ByteBuf buf);
-    void readFromCache(Object data, T object);
+    void read(Object data, T object);
 }

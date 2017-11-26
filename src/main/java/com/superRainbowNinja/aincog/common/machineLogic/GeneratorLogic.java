@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * Created by SuperRainbowNinja on 3/12/2016.
  *
  */
-public class GeneratorLogic implements IMachineLogic {
+public class GeneratorLogic extends BaseLogic {
     private static final String NAME = "generator_logic";
     public static final int RF_PER_TICK = 80;
     public static final int RF_PER_REDSTONE = RF_PER_TICK*240;
@@ -43,7 +43,7 @@ public class GeneratorLogic implements IMachineLogic {
     }
 
     @Override
-    public void tick(MachineFrameTile tile) {
+    public void tick() {
         if (!tile.getWorld().isRemote) {
             int rfPerTick = getRfPerTick(tile);
             IEnergyStorage storage =  tile.getEnergy();
@@ -84,11 +84,11 @@ public class GeneratorLogic implements IMachineLogic {
         if (!tile.getWorld().isRemote) {
             boolean update = false;
             if (rfMiniBuf == 0) {
-                ItemStack stack = tile.getStackInSlot(0);
-                if (stack != null) {
-                    stack.stackSize--;
+                ItemStack thisStack = tile.getStackInSlot(0);
+                if (thisStack != null) {
+                    thisStack.stackSize--;
                     rfMiniBuf = RF_PER_REDSTONE;
-                    if (stack.stackSize == 0) {
+                    if (thisStack.stackSize == 0) {
                         tile.setInventorySlotContents(0, null);
                         update = true;
                     }
@@ -116,7 +116,8 @@ public class GeneratorLogic implements IMachineLogic {
     }
 
     @Override
-    public void initMachine(MachineFrameTile tile) {
+    public void initMachine(MachineFrameTile tileIn) {
+        super.initMachine(tileIn);
         tile.setBatteryBehaviour(MachineFrameTile.BatteryBehaviour.PROVIDE);
         tile.resizeInv(1);
     }
@@ -127,24 +128,24 @@ public class GeneratorLogic implements IMachineLogic {
     }
 
     @Override
-    public void insertItem(MachineFrameTile te, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (InvUtil.insertIntoSlotFromPlayer(playerIn, te, 0, heldItem, (i) -> Items.REDSTONE == i))
-            te.markVisualDirty();
+    public void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (InvUtil.insertIntoSlotFromPlayer(playerIn, tile, 0, heldItem, (i) -> Items.REDSTONE == i))
+            tile.markVisualDirty();
     }
 
     @Override
-    public void removeItem(MachineFrameTile te, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = te.getStackInSlot(0);
+    public void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack stack = tile.getStackInSlot(0);
         if (stack != null) {
             playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, stack);
-            te.setInventorySlotContents(0, null);
-            te.markVisualDirty();
+            tile.setInventorySlotContents(0, null);
+            tile.markVisualDirty();
         }
     }
 
     @Override
-    public void renderTileEntityAt(MachineFrameRender r, MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage) {
-        ItemStack stack = teIn.getStackInSlot(0);
+    public void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage) {
+        ItemStack stack = tile.getStackInSlot(0);
         if (stack != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
@@ -152,7 +153,7 @@ public class GeneratorLogic implements IMachineLogic {
 
             final float val = 360/100f;
             float d0 = (float) (
-                    (teIn.getWorld().getWorldTime() % 100) * val
+                    (tile.getWorld().getWorldTime() % 100) * val
                     + ((double) partialTicks) * val
             );
             GlStateManager.rotate(d0, 0, 1, 0);
@@ -162,14 +163,14 @@ public class GeneratorLogic implements IMachineLogic {
     }
 
     @Override
-    public void spawnParticles(MachineFrameTile tile, WorldServer worldServer, BlockPos pos) {
+    public void spawnParticles(WorldServer worldServer, BlockPos pos) {
         if (tile.getCurOp() != Operation.NOP) {
             worldServer.spawnParticle(EnumParticleTypes.REDSTONE, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 10, 0.05, 0.05, 0.05, 0.0D);//, Item.getIdFromItem(AIncogData.MAKESHIFT_CORE));
         }
     }
 
     @Override
-    public void coreRemoved(MachineFrameTile teIn) {
+    public void coreRemoved() {
         rfMiniBuf = 0; //the operation will be auto wipped, we just need 2 worry about internals of this class
     }
 

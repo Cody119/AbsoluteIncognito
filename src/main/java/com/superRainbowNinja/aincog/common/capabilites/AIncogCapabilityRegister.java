@@ -20,32 +20,50 @@ public class AIncogCapabilityRegister {
                 new Capability.IStorage<IPoweredWeaponCap>(){
                     @Override
                     public NBTBase writeNBT(Capability<IPoweredWeaponCap> capability, IPoweredWeaponCap instance, EnumFacing side) {
-                        System.out.println("Write");
+                        //System.out.println("Write");
                         //return new NBTTagInt(instance.getInitialTimeStamp());
                         return new NBTTagCompound();
                     }
 
                     @Override
                     public void readNBT(Capability<IPoweredWeaponCap> capability, IPoweredWeaponCap instance, EnumFacing side, NBTBase nbt) {
-                        System.out.println("read");
+                        //System.out.println("read");
                         //instance.setInitialTimeStamp(((NBTTagInt) nbt).getInt());
                     }
                 },
                 PoweredWeaponCapImp::new
+        );
+        CapabilityManager.INSTANCE.register(ICoreContainer.class,
+                //Storage provider, no idea what it is actually used for though
+                new Capability.IStorage<ICoreContainer>(){
+                    @Override
+                    public NBTBase writeNBT(Capability<ICoreContainer> capability, ICoreContainer instance, EnumFacing side) {
+                        //System.out.println("Write");
+                        //return new NBTTagInt(instance.getInitialTimeStamp());
+                        return new NBTTagCompound();
+                    }
+
+                    @Override
+                    public void readNBT(Capability<ICoreContainer> capability, ICoreContainer instance, EnumFacing side, NBTBase nbt) {
+                        //System.out.println("read");
+                        //instance.setInitialTimeStamp(((NBTTagInt) nbt).getInt());
+                    }
+                },
+                CoreContainerImp::new
         );
         CapabilityManager.INSTANCE.register(ILockableTank.class,
                 //Storage provider, no idea what it is actually used for though
                 new Capability.IStorage<ILockableTank>(){
                     @Override
                     public NBTBase writeNBT(Capability<ILockableTank> capability, ILockableTank instance, EnumFacing side) {
-                        System.out.println("Write");
+                        //System.out.println("Write");
                         //return new NBTTagInt(instance.getInitialTimeStamp());
                         return new NBTTagCompound();
                     }
 
                     @Override
                     public void readNBT(Capability<ILockableTank> capability, ILockableTank instance, EnumFacing side, NBTBase nbt) {
-                        System.out.println("read");
+                        //System.out.println("read");
                         //instance.setInitialTimeStamp(((NBTTagInt) nbt).getInt());
                     }
                 },

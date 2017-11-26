@@ -113,7 +113,7 @@ public class FakeInventory implements IInventory {
         //Not sure what these are for exactly
     }
 
-    //Used for automated stack insertion (not player adding of stack)
+    //Used for automated thisStack insertion (not player adding of thisStack)
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         //Not sure if this will be used, but just set it 2 true for now

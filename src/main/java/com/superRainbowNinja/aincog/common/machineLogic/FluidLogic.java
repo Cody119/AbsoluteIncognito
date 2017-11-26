@@ -2,6 +2,7 @@ package com.superRainbowNinja.aincog.common.machineLogic;
 
 import com.superRainbowNinja.aincog.common.capabilites.ILockableTank;
 import com.superRainbowNinja.aincog.common.capabilites.LockableTankImp;
+import com.superRainbowNinja.aincog.common.items.BasicCore;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
 import com.superRainbowNinja.aincog.util.LogHelper;
 import net.minecraft.item.ItemStack;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by SuperRainbowNinja on 19/12/2016.
  */
-public abstract class FluidLogic implements IMachineLogic {
+public abstract class FluidLogic extends BaseLogic {
     protected ILockableTank tank;
 
     protected void setTank(MachineFrameTile tile) {
@@ -31,12 +32,14 @@ public abstract class FluidLogic implements IMachineLogic {
     }
 
     @Override
-    public void postDeserialize(MachineFrameTile tile) {
+    public void postDeserialize(MachineFrameTile tileIn) {
+        super.postDeserialize(tileIn);
         setTank(tile);
     }
 
     @Override
-    public void initMachine(MachineFrameTile tile) {
+    public void initMachine(MachineFrameTile tileIn) {
+        super.initMachine(tileIn);
         setTank(tile);
     }
 

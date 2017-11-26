@@ -75,6 +75,7 @@ public class AIncogData {
 
     // items
     public static final PoweredWeapon LASER_SWORD = new PoweredWeapon("laser_sword", 2000);
+    public static final MultiTool MULTI_TOOL = new MultiTool();
     public static final MachineLock MACHINE_LOCK = new MachineLock();
     public static final MakeshiftCore MAKESHIFT_CORE = new MakeshiftCore();
     public static final TankComponent TANK_COMPONENT = new TankComponent();
@@ -158,6 +159,7 @@ public class AIncogData {
         CommonProxy.add(MACHINE_FRAME);
         CommonProxy.add(GLOW_TEST);
 
+        CommonProxy.add(MULTI_TOOL);
         CommonProxy.add(LASER_SWORD);
         CommonProxy.add(MAKESHIFT_CORE);
         CommonProxy.add(COIL);
@@ -214,31 +216,33 @@ public class AIncogData {
         OreFormerLogic.addRecipe(AssortedUtil.fluidStack(GREEN_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), GREEN_CRYSTAL_ORE.getDefaultState());
         OreFormerLogic.addRecipe(AssortedUtil.fluidStack(BLUE_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), BLUE_CRYSTAL_ORE.getDefaultState());
         OreFormerLogic.addRecipe(AssortedUtil.fluidStack(RED_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), RED_CRYSTAL_ORE.getDefaultState());
+        OreFormerLogic.addRecipe(AssortedUtil.fluidStack("water", OreFormerLogic.FLUID_PER_ORE),
+                FluidRegistry.LAVA.getBlock().getDefaultState(),
+                Blocks.OBSIDIAN.getDefaultState()
+        );
 
-        ArcFurnaceLogic.RecipeRegistry.add(new FluidStack(FluidRegistry.getFluid(AIncogData.WHITE_CRYSTAL_FLUID.name), 500),
+        ArcFurnaceLogic.RecipeRegistry.add(AssortedUtil.fluidStack(AIncogData.WHITE_CRYSTAL_FLUID.name, 500),
                 new ItemStack(Items.REDSTONE, 16),
                 new ItemStack(Items.COAL, 32),
                 new ItemStack(Blocks.GLASS, 16)
         );
-        ArcFurnaceLogic.RecipeRegistry.add(new FluidStack(FluidRegistry.getFluid(AIncogData.RED_CRYSTAL_FLUID.name), 500),
+        ArcFurnaceLogic.RecipeRegistry.add(AssortedUtil.fluidStack(AIncogData.RED_CRYSTAL_FLUID.name, 500),
                 new ItemStack(Items.REDSTONE, 16),
                 new ItemStack(Items.GOLD_INGOT, 8),
                 new ItemStack(Blocks.COBBLESTONE, 32)
         );
-        ArcFurnaceLogic.RecipeRegistry.add(new FluidStack(FluidRegistry.getFluid(AIncogData.GREEN_CRYSTAL_FLUID.name), 500),
+        ArcFurnaceLogic.RecipeRegistry.add(AssortedUtil.fluidStack(AIncogData.GREEN_CRYSTAL_FLUID.name, 500),
                 new ItemStack(Items.REDSTONE, 16),
                 new ItemStack(Items.IRON_INGOT, 16),
                 new ItemStack(Blocks.DIRT, 32)
         );
-        ArcFurnaceLogic.RecipeRegistry.add(new FluidStack(FluidRegistry.getFluid(AIncogData.BLUE_CRYSTAL_FLUID.name), 500),
+        ArcFurnaceLogic.RecipeRegistry.add(AssortedUtil.fluidStack(AIncogData.BLUE_CRYSTAL_FLUID.name, 500),
                 new ItemStack(Items.REDSTONE, 16),
                 new ItemStack(Items.DYE, 8, 4),
                 new ItemStack(Items.CLAY_BALL, 16)
         );
-        ArcFurnaceLogic.RecipeRegistry.add(new FluidStack(FluidRegistry.getFluid(AIncogData.BLUE_CRYSTAL_FLUID.name), 500),
-                new ItemStack(Items.REDSTONE, 16),
-                new ItemStack(Items.DYE, 8, 4),
-                new ItemStack(Blocks.CLAY, 4)
+        ArcFurnaceLogic.RecipeRegistry.add(AssortedUtil.fluidStack("lava", 50), 24,
+                new ItemStack(Blocks.COBBLESTONE, 1)
         );
     }
 }

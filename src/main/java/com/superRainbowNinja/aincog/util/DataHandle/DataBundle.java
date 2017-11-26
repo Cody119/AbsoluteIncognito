@@ -13,7 +13,7 @@ import java.util.Map;
  */
 
 public class DataBundle<T> implements IFieldHandle<T> {
-    private final IFieldHandle<T>[] fields;
+    protected final IFieldHandle<T>[] fields;
     private final Map<String, IFieldHandle<T>> fieldMap;
 
     public static <X> DataBundle<X> create(IFieldHandle<X> ... handles) {
@@ -24,7 +24,7 @@ public class DataBundle<T> implements IFieldHandle<T> {
      * http://stackoverflow.com/questions/12462079/potential-heap-pollution-via-varargs-parameter
     * */
     @SafeVarargs
-    private DataBundle(IFieldHandle<T> ... handles) {
+    protected DataBundle(IFieldHandle<T> ... handles) {
         fields = handles;
         ImmutableMap.Builder<String, IFieldHandle<T>> builder = ImmutableMap.builder();
         for (IFieldHandle<T> field : fields) {
@@ -35,6 +35,10 @@ public class DataBundle<T> implements IFieldHandle<T> {
 
     public IFieldHandle<T> getFieldHandle(String name) {
         return fieldMap.get(name);
+    }
+
+    public int fieldCount() {
+        return fields.length;
     }
 
     @Override
@@ -58,7 +62,10 @@ public class DataBundle<T> implements IFieldHandle<T> {
 
     @Override
     public Object read(NBTTagCompound tag) {
-        Object[] objects = new Object[fields.length];
+        return read(tag, new Object[fields.length]);
+    }
+
+    public Object[] read(NBTTagCompound tag, Object[] objects) {
         for (int i = 0; i < fields.length; i++) {
             objects[i] = fields[i].read(tag);
         }
@@ -81,7 +88,11 @@ public class DataBundle<T> implements IFieldHandle<T> {
 
     @Override
     public Object read(ByteBuf buf) {
-        Object[] objects = new Object[fields.length];
+        return read(buf, new Object[fields.length]);
+
+    }
+
+    public Object[] read(ByteBuf buf, Object[] objects) {
         for (int i = 0; i < fields.length; i++) {
             objects[i] = fields[i].read(buf);
         }
@@ -89,14 +100,14 @@ public class DataBundle<T> implements IFieldHandle<T> {
     }
 
     @Override
-    public void readFromCache(Object data, T object) {
+    public void read(Object data, T object) {
         readFromCache((Object[])data, object);
 
     }
 
     public void readFromCache(Object[] data, T object) {
         for (int i = 0; i < fields.length; i++) {
-            fields[i].readFromCache(data[i], object);
+            fields[i].read(data[i], object);
         }
     }
 }

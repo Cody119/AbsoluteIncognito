@@ -15,7 +15,7 @@ public interface ILockableTank extends IFluidHandler {
     void setState(LockableTankImp.OutputState state);
 
     //these 2 are generally implicitly overridden
-    //void setFluid(FluidStack stack);
+    //void setFluid(FluidStack thisStack);
     //FluidStack getFluid();
     //int getCapacity();
 }
