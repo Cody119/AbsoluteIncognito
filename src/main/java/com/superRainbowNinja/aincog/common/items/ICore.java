@@ -26,9 +26,12 @@ public interface ICore {
 
     int getPrimaryColor(ItemStack core);
     int getSecondaryColor(ItemStack core);
-    public int getOutlineColor(ItemStack core);
+    int getOutlineColor(ItemStack core);
 
+    //how much energy is consumed (or how much rf per item in generators)
     float getEfficiency(ItemStack core);
+    //how fast an operation can be completed
     float getSpeed(ItemStack core);
+    //power or machine/weapon/tool, generally increase combat stats rather then productivity
     float getStrength(ItemStack core);
 }

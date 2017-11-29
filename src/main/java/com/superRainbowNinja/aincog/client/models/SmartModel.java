@@ -18,6 +18,11 @@ import java.util.List;
  */
 public class SmartModel implements IPerspectiveAwareModel {
     protected IPerspectiveAwareModel baseModel;
+
+    public SmartModelOverride getItemOverrideList() {
+        return itemOverrideList;
+    }
+
     private SmartModelOverride itemOverrideList;
 
     public SmartModel(IPerspectiveAwareModel modelIn, SmartModelOverride overrideListIn) {

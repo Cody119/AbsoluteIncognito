@@ -1,17 +1,13 @@
 package com.superRainbowNinja.aincog.common.containers;
 
 import com.superRainbowNinja.aincog.common.inventorys.FakeInventory;
+import com.superRainbowNinja.aincog.common.items.CoreContainerItem;
 import com.superRainbowNinja.aincog.common.items.ICore;
-import com.superRainbowNinja.aincog.common.items.PoweredWeapon;
-import com.superRainbowNinja.aincog.common.network.InventoryUpdate;
-import com.superRainbowNinja.aincog.common.network.PacketHandler;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagInt;
 
 import javax.annotation.Nullable;
 
@@ -19,44 +15,44 @@ import javax.annotation.Nullable;
  * Created by SuperRainbowNinja on 10/10/2016.
  *
  */
-public class WeaponContainer  extends Container {
+public class CoreContainer extends Container {
     //Maybe i dont need a refrence to this?
-    private FakeInventory weaponInv;
+    private FakeInventory itemInv;
 
-    public int getWeaponSlot() {
-        return weaponSlot;
+    public int getItemSlot() {
+        return itemSlot;
     }
 
     public boolean isDirty() {
         return dirty;
     }
 
-    public void swordUpdated() {
+    public void itemUpdated() {
         dirty = false;
     }
 
     private boolean dirty = false;
-    private int weaponSlot;
+    private int itemSlot;
     private boolean canUse = true;
     private EntityPlayer player;
 
     //called by client (the gui)
-    public WeaponContainer(EntityPlayer playerInv, int weaponSlotIn, boolean b) {
+    public CoreContainer(EntityPlayer playerInv, int weaponSlotIn, boolean b) {
         this(playerInv, weaponSlotIn);
     }
 
-    public WeaponContainer(EntityPlayer playerIn, int weaponSlotIn) {
-        weaponSlot = weaponSlotIn;
+    public CoreContainer(EntityPlayer playerIn, int weaponSlotIn) {
+        itemSlot = weaponSlotIn;
         player = playerIn;
 
         IInventory playerInv = player.inventory;
-        ItemStack weaponStack = playerInv.getStackInSlot(weaponSlot);
+        ItemStack weaponStack = playerInv.getStackInSlot(itemSlot);
 
-        weaponInv = new FakeInventory("container.sword", 1, new ItemStack[]{
-                PoweredWeapon.getCore(weaponStack)
+        itemInv = new FakeInventory("container.sword", 1, new ItemStack[]{
+                CoreContainerItem.getCore(weaponStack)
         });
         // Slot ID 0
-        addSlotToContainer(new CoreSlot(weaponInv, 0, 80, 17 + 18, this));
+        addSlotToContainer(new CoreSlot(itemInv, 0, 80, 17 + 18, this));
 
         // Player Inventory, Slot 9-35, Slot IDs 1-27, co stolen from bedrock miners tutorial
         for (int y = 0; y < 3; ++y) {
@@ -76,7 +72,7 @@ public class WeaponContainer  extends Container {
     }
 
     public void slotChange() {
-        if (player.inventory.getStackInSlot(weaponSlot) == null) {
+        if (player.inventory.getStackInSlot(itemSlot) == null) {
             // This means the item disappeared from where we
             // excepted it to be.... not good
             // the code is in place 2 throw the whatever is in the core thisStack into the world
@@ -101,7 +97,7 @@ public class WeaponContainer  extends Container {
     @Override
     public void onContainerClosed(EntityPlayer playerIn) {
         //if (!playerIn.getEntityWorld().isRemote) {
-            //PacketHandler.sendTo((EntityPlayerMP) playerIn, new InventoryUpdate(playerIn.inventory.getStackInSlot(weaponSlot), weaponSlot));
+            //PacketHandler.sendTo((EntityPlayerMP) playerIn, new InventoryUpdate(playerIn.inventory.getStackInSlot(itemSlot), itemSlot));
         //}
         super.onContainerClosed(playerIn);
     }
@@ -147,9 +143,9 @@ public class WeaponContainer  extends Container {
     }
 
     public static class CoreSlot extends Slot {
-        private WeaponContainer gui;
+        private CoreContainer gui;
 
-        public CoreSlot(IInventory inventoryIn, int index, int xPosition, int yPosition, WeaponContainer playerIn) {
+        public CoreSlot(IInventory inventoryIn, int index, int xPosition, int yPosition, CoreContainer playerIn) {
             super(inventoryIn, index, xPosition, yPosition);
             gui = playerIn;
         }

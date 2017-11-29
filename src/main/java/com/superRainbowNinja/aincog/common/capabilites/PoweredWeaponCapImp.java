@@ -32,14 +32,6 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
         super(weaponIn);
     }
 
-
-
-//    public void cacheCheck() {
-//        if (!isCached) {
-//            loadFromCache();
-//        }
-//    }
-//
     @Override
     public void cache() {
         super.cache();
@@ -91,73 +83,6 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
         return state;
     }
 
-//    @Override
-//    public boolean setCoreDamage(int dmg) {
-//        cacheCheck();
-//        if (core != null && ((ICore) core.getItem()).setCoreDamage(core, dmg)) {
-//            core.writeToNBT(weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true));
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public int getCoreMaxDamage() {
-//        cacheCheck();
-//        return core != null ? ((ICore)core.getItem()).getMaxCoreDamage(core) : 0;
-//    }
-//
-//    @Override
-//    public int getCoreDamage() {
-//        cacheCheck();
-//        return core != null ? ((ICore)core.getItem()).getCoreDamage(core) : 0;
-//    }
-//
-//    @Override
-//    public boolean trySetCore(ItemStack thisStack, boolean simulate) {
-//        cacheCheck();
-//        if (!hasCore() && thisStack != null && thisStack.getItem() instanceof ICore) {
-//            if (!simulate){
-//                core = thisStack.copy();
-//                core.writeToNBT(weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true)).setBoolean(CORE_ITEM, true);
-//            }
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public void loseCore() {
-//        core = null;
-//        weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setBoolean(CORE_ITEM, false);
-//    }
-//
-//    @Override
-//    public void setCore(ItemStack thisStack) {
-//        cacheCheck();
-//        if (thisStack != null && thisStack.getItem() instanceof ICore) {
-//            core = thisStack.copy();
-//            core.writeToNBT(weapon.getSubCompound(POWERED_WEAPON_CAP_KEY, true)).setBoolean(CORE_ITEM, true);
-//        } else {
-//            throw new RuntimeException("Tried to set invalid core into power weapon cap: " + thisStack);
-//        }
-//    }
-//
-//    @Nullable
-//    @Override
-//    public ItemStack getCoreItemStack() {
-//        cacheCheck();
-//        return core;
-//    }
-//
-//    @Nullable
-//    @Override
-//    public ICore getCoreItem() {
-//        cacheCheck();
-//        return core == null ? null : (ICore) core.getItem();
-//    }
-
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == POWERED_WEAPON_CAP || super.hasCapability(capability, facing);
@@ -166,29 +91,5 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
         return (capability == POWERED_WEAPON_CAP) ? (T) this : super.getCapability(capability, facing);
-    }
-
-    @Override
-    public NBTTagCompound serializeNBT() {
-        /*
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger(DIM_ID_KEY, dimId);
-        tag.setLong(REC_TIME_KEY, recTimeStamp);
-        tag.setBoolean(WEAPON_STATE, state);
-        if (core != null)
-            tag.setTag(CORE_ITEM, core.writeToNBT(new NBTTagCompound()));
-
-        */
-        return new NBTTagCompound();
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
-        /*
-        dimId = nbt.getInteger(DIM_ID_KEY);
-        recTimeStamp = nbt.getLong(REC_TIME_KEY);
-        state = nbt.getBoolean(WEAPON_STATE);
-        core = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag(CORE_ITEM));
-        */
     }
 }

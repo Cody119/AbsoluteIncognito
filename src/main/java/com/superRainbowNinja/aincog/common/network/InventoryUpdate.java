@@ -37,14 +37,14 @@ public class InventoryUpdate extends PacketBase{
     @Override
     public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeItemStack(buf, stack);
-        ByteBufUtils.writeTag(buf, ((PoweredWeaponCapImp) IPoweredWeaponCap.getCap(stack)).serializeNBT());
+    //    ByteBufUtils.writeTag(buf, ((PoweredWeaponCapImp) IPoweredWeaponCap.getCap(stack)).serializeNBT());
         buf.writeInt(pos);
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
         stack = ByteBufUtils.readItemStack(buf);
-        ((PoweredWeaponCapImp) IPoweredWeaponCap.getCap(stack)).deserializeNBT(ByteBufUtils.readTag(buf));
+  //      ((PoweredWeaponCapImp) IPoweredWeaponCap.getCap(stack)).deserializeNBT(ByteBufUtils.readTag(buf));
         pos = buf.readInt();
         valid = true;
     }

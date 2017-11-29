@@ -1,7 +1,7 @@
 package com.superRainbowNinja.aincog.common.network;
 
 import com.superRainbowNinja.aincog.client.gui.WeaponGui;
-import com.superRainbowNinja.aincog.common.containers.WeaponContainer;
+import com.superRainbowNinja.aincog.common.containers.CoreContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -14,7 +14,7 @@ public class GuiHandler implements IGuiHandler {
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        if (ID == WEAPON_GUI) return new WeaponContainer(player, player.inventory.currentItem);
+        if (ID == WEAPON_GUI) return new CoreContainer(player, player.inventory.currentItem);
         return null;
     }
 

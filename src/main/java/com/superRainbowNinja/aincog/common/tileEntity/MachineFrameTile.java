@@ -85,7 +85,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         return true;
     }
 
-    private void removeFrame(Vec3d vec) {
+    public void removeFrame(Vec3d vec) {
         if (locked) {
             dropLock(vec);
             dropInventory();

@@ -69,5 +69,23 @@ public class AIncogCapabilityRegister {
                 },
                 LockableTankImp::new
         );
+        CapabilityManager.INSTANCE.register(IMultiToolCapable.class,
+                //Storage provider, no idea what it is actually used for though
+                new Capability.IStorage<IMultiToolCapable>(){
+                    @Override
+                    public NBTBase writeNBT(Capability<IMultiToolCapable> capability, IMultiToolCapable instance, EnumFacing side) {
+                        //System.out.println("Write");
+                        //return new NBTTagInt(instance.getInitialTimeStamp());
+                        return new NBTTagCompound();
+                    }
+
+                    @Override
+                    public void readNBT(Capability<IMultiToolCapable> capability, IMultiToolCapable instance, EnumFacing side, NBTBase nbt) {
+                        //System.out.println("read");
+                        //instance.setInitialTimeStamp(((NBTTagInt) nbt).getInt());
+                    }
+                },
+                MultiToolCapableImp::new
+        );
     }
 }

@@ -1,6 +1,7 @@
 package com.superRainbowNinja.aincog.common.capabilites;
 
 import com.superRainbowNinja.aincog.common.items.ICore;
+import com.superRainbowNinja.aincog.util.LogHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -14,7 +15,7 @@ import javax.annotation.Nullable;
 /**
  * Created by SuperRainbowNinja on 26/11/2017.
  */
-public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapabilitySerializable<NBTTagCompound> {
+public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapabilityProvider {
     public static final String CORE_ITEM = "CORE_ITEM";
     public static final String CAP_KEY = "CORE_CONTAINER_CAP";
 
@@ -39,11 +40,14 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
     @Override
     public boolean setCoreDamage(int dmg) {
         cacheCheck();
-        if (core != null && ((ICore) core.getItem()).setCoreDamage(core, dmg)) {
+        boolean ret = false;
+        if (core != null) {
+            if (((ICore) core.getItem()).setCoreDamage(core, dmg)) {
+                ret = true;
+            }
             core.writeToNBT(thisStack.getSubCompound(CAP_KEY, true));
-            return true;
         }
-        return false;
+        return ret;
     }
 
     @Override
@@ -105,22 +109,12 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == ICoreContainer.CORE_CONTAINER_CAP || capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+        return capability == CORE_CONTAINER_CAP || capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        return capability == ICoreContainer.CORE_CONTAINER_CAP || capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ?
-                (T) this : null;
-    }
-
-    @Override
-    public NBTTagCompound serializeNBT() {
-        return null;
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
-
+        return capability == CORE_CONTAINER_CAP || capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+                ? (T) this : null;
     }
 }

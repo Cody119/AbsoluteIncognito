@@ -3,11 +3,9 @@ package com.superRainbowNinja.aincog.common.items;
 import com.superRainbowNinja.aincog.AIncogData;
 import com.superRainbowNinja.aincog.AbsoluteIncognito;
 import com.superRainbowNinja.aincog.common.capabilites.ICoreContainer;
-import com.superRainbowNinja.aincog.common.containers.WeaponContainer;
+import com.superRainbowNinja.aincog.common.containers.CoreContainer;
 import com.superRainbowNinja.aincog.common.network.GuiHandler;
 import com.superRainbowNinja.aincog.common.capabilites.IPoweredWeaponCap;
-import com.superRainbowNinja.aincog.common.network.InventoryUpdate;
-import com.superRainbowNinja.aincog.common.network.PacketHandler;
 import com.superRainbowNinja.aincog.refrence.Reference;
 import com.superRainbowNinja.aincog.util.DamageUtil;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -16,7 +14,6 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
@@ -43,7 +40,7 @@ import java.util.List;
  * TODO particles when core breaks
  *    -refer to EntityLivingBase.renderBrokenItemStack for the math, may need 2 use the sserver version of spawn particles (done in machineframetile)
  */
-public class PoweredWeapon extends AIItemBase {
+public class PoweredWeapon extends CoreContainerItem {
 
     private static final float MAX_DAMAGE = 7f;
 
@@ -63,37 +60,9 @@ public class PoweredWeapon extends AIItemBase {
         */
     }
 
-    /*---------------------------
-    |  Public Methods           |
+    /*----------------------------
+    |  Public Methods            |
     ----------------------------*/
-
-    @Override
-    public boolean getShareTag() {
-        return true;
-    }
-
-    public static ItemStack getCore(ItemStack weapon) {
-        return ICoreContainer.getCap(weapon).getCoreItemStack();
-    }
-
-    public boolean trySetCore(ItemStack weapon, ItemStack core) {
-        ICoreContainer cap = ICoreContainer.getCap(weapon);
-        if (cap.trySetCore(core, false)) {
-            weapon.setItemDamage(cap.getCoreDamage());
-            System.out.println("set core");
-            return true;
-        }
-        return false;
-    }
-
-    public void loseCore(ItemStack weapon) {
-        weapon.setItemDamage(0);
-        ICoreContainer.getCap(weapon).loseCore();
-    }
-
-    public boolean hasCore(ItemStack stack) {
-        return ICoreContainer.hasCore(stack);
-    }
 
     public boolean weaponCanActivate(ItemStack stack) {
 
@@ -129,56 +98,9 @@ public class PoweredWeapon extends AIItemBase {
         }
     }
 
-    public void updateCoreFromContainer(EntityPlayer player, ItemStack weapon, WeaponContainer container) {
-        if (container.isDirty() && !player.getEntityWorld().isRemote) {
-            ICoreContainer cap = IPoweredWeaponCap.getCap(weapon);
-            ItemStack core = container.getSlot(0).getStack();
-            if (core == null) {
-                if (cap.hasCore()) {
-                    loseCore(weapon);
-                    //System.out.println("Send packet");
-                    //PacketHandler.sendTo((EntityPlayerMP) player, new InventoryUpdate(weapon, container.getWeaponSlot()));
-                }
-            } else {
-                if (cap.hasCore()) {
-                    ItemStack cCore = cap.getCoreItemStack();
-                    if (!(ItemStack.areItemStacksEqual(cCore, core) && cCore.areCapsCompatible(core))) {
-                        loseCore(weapon);
-                        if (!trySetCore(weapon, core)) {
-                            //setCore(weapon, cCore, cap);
-                            container.closeInv(true);
-                        } else {
-                            //this should be safe as this is only called on the server side
-                            //System.out.println("Send packet");
-                            //PacketHandler.sendTo((EntityPlayerMP) player, new InventoryUpdate(weapon, container.getWeaponSlot()));
-                        }
-                    }
-                } else {
-                    if (!trySetCore(weapon, core)) {
-                        //not a valid core in slot
-                        container.closeInv(true);
-                    } else {
-                        //System.out.println("Send packet");
-                        //PacketHandler.sendTo((EntityPlayerMP) player, new InventoryUpdate(weapon, container.getWeaponSlot()));
-                    }
-                }
-            }
-        }
-        container.swordUpdated();
-    }
-
-    /*---------------------------
+    /*----------------------------
     |  Internal Methods          |
     ----------------------------*/
-
-    private void setCore(ItemStack weapon, ItemStack core) {
-        setCore(weapon, core, ICoreContainer.getCap(weapon));
-    }
-
-    private void setCore(ItemStack weapon, ItemStack core, ICoreContainer cap) {
-        cap.setCore(core);
-        weapon.setItemDamage(cap.getCoreDamage());
-    }
 
     private void timeDamage(ItemStack stack, long timeLapse, IPoweredWeaponCap cap) {
         int maxDmg = getMaxDamage(stack);
@@ -212,7 +134,7 @@ public class PoweredWeapon extends AIItemBase {
         return thisStack.getTagCompound();
     }
 */
-    /*---------------------------
+    /*----------------------------
     |  Override Methods          |
     ----------------------------*/
 
@@ -225,9 +147,9 @@ public class PoweredWeapon extends AIItemBase {
                 ICore core = cap.getCoreItem();
                 ItemStack coreStack = cap.getCoreItemStack();
                 if (player.getCooledAttackStrength(0.5F) > 0.95) {
-                    DamageUtil.swingSwordParticlesDamage(player, (EntityLivingBase) entity, MAX_DAMAGE * core.getEfficiency(coreStack), 0.5f);
+                    DamageUtil.swingSwordParticlesDamage(player, (EntityLivingBase) entity, MAX_DAMAGE * core.getStrength(coreStack), 0.5f);
                 } else {
-                    DamageUtil.playerAttack(player, (EntityLivingBase) entity, MAX_DAMAGE * core.getEfficiency(coreStack));
+                    DamageUtil.playerAttack(player, (EntityLivingBase) entity, MAX_DAMAGE * core.getStrength(coreStack));
                 }
                 return true;
             } /*else {
@@ -241,19 +163,9 @@ public class PoweredWeapon extends AIItemBase {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return ICoreContainer.getCap(stack).getCoreMaxDamage();
-    }
-
-    @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)  {
         if (!worldIn.isRemote) updateWeaponInfo(stack, worldIn);
-        if (entityIn instanceof EntityPlayer) {
-            EntityPlayer player = ((EntityPlayer) entityIn);
-            if (player.openContainer instanceof WeaponContainer && ((WeaponContainer) player.openContainer).getWeaponSlot() == itemSlot) {
-                updateCoreFromContainer(player, stack, ((WeaponContainer) player.openContainer));
-            }
-        }
+        super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
     }
 
     @Override
@@ -271,8 +183,7 @@ public class PoweredWeapon extends AIItemBase {
         if (playerIn.isSneaking() && hand == EnumHand.MAIN_HAND && !cap.weaponIsOn()) {
             if (!worldIn.isRemote) {
                 updateWeaponInfo(itemStackIn, worldIn);
-                //PacketHandler.sendTo((EntityPlayerMP) playerIn, new InventoryUpdate(itemStackIn, playerIn.inventory.currentItem));
-                playerIn.openGui(AbsoluteIncognito.instance, GuiHandler.WEAPON_GUI, worldIn, 0, 0, 0);
+                openGui(playerIn, worldIn);
             }
         } else if (weaponCanActivate(itemStackIn)) {
             if (cap.weaponIsOn()) {
@@ -291,8 +202,7 @@ public class PoweredWeapon extends AIItemBase {
     }
 
     @Override
-    public EnumAction getItemUseAction(ItemStack stack)
-    {
+    public EnumAction getItemUseAction(ItemStack stack) {
         return EnumAction.NONE;
     }
 
@@ -321,7 +231,7 @@ public class PoweredWeapon extends AIItemBase {
 
     public static ModelResourceLocation HANDLE = new ModelResourceLocation(Reference.MOD_ID + ":" + "laser_sword", "inventory");
     public static ModelResourceLocation BLADE = new ModelResourceLocation(Reference.MOD_ID + ":" + "laser_sword_blade", "inventory");
-    public static ModelResourceLocation CORE = new ModelResourceLocation(Reference.MOD_ID + ":" + "laser_sword_core", "inventory");
+    public static ModelResourceLocation CORE = new ModelResourceLocation(Reference.MOD_ID + ":" + "tool_core", "inventory");
 
     @Override
     @SideOnly(Side.CLIENT)

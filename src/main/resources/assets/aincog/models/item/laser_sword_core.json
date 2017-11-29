@@ -1,6 +1,0 @@
-{
-  "parent": "aincog:item/laser_sword",
-  "textures": {
-    "layer0": "aincog:items/laser_sword_core"
-  }
-}

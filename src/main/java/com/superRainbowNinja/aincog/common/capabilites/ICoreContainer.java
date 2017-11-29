@@ -1,6 +1,7 @@
 package com.superRainbowNinja.aincog.common.capabilites;
 
 import com.superRainbowNinja.aincog.common.items.ICore;
+import com.superRainbowNinja.aincog.util.LogHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -14,7 +15,7 @@ import javax.annotation.Nullable;
  */
 public interface ICoreContainer extends IItemHandler {
     @CapabilityInject(ICoreContainer.class)
-    Capability<IPoweredWeaponCap> CORE_CONTAINER_CAP = null;
+    Capability<ICoreContainer> CORE_CONTAINER_CAP = null;
 
     //returning true indicates the core is broken (not out of energy, broken)
     boolean setCoreDamage(int dmg);
@@ -72,7 +73,7 @@ public interface ICoreContainer extends IItemHandler {
     }
 
     static boolean hasCore(ItemStack stack) {
-        return stack.getCapability(IPoweredWeaponCap.POWERED_WEAPON_CAP, EnumFacing.DOWN).hasCore();
+        return stack.getCapability(CORE_CONTAINER_CAP, EnumFacing.DOWN).hasCore();
     }
 
 }
