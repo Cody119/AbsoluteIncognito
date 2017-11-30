@@ -89,9 +89,25 @@ public class CoreContainerItem extends AIItemBase{
         container.itemUpdated();
     }
 
+    //set for both core and sword, maybe make defualt imp do this as well??
+    public void damage(ItemStack stack, int dmg, ICoreContainer cap) {
+        super.setDamage(stack, cap.getCoreDamage() + dmg);
+        if (cap.setCoreDamage(cap.getCoreDamage() + dmg)) {
+            loseCore(stack);
+        }
+    }
+
     /*----------------------------
     |  Internal Methods          |
     ----------------------------*/
+
+    //set for both core and sword, maybe make defualt imp do this as well??
+    protected void setDamage(ItemStack stack, int dmg, ICoreContainer cap) {
+        super.setDamage(stack, dmg);
+        if (cap.setCoreDamage(dmg)) {
+            loseCore(stack);
+        }
+    }
 
     protected void openGui(EntityPlayer playerIn, World worldIn) {
         playerIn.openGui(AbsoluteIncognito.instance, GuiHandler.WEAPON_GUI, worldIn, 0, 0, 0);

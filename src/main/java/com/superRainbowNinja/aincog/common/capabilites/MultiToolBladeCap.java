@@ -1,6 +1,7 @@
 package com.superRainbowNinja.aincog.common.capabilites;
 
 import com.superRainbowNinja.aincog.client.models.MultiToolModel;
+import com.superRainbowNinja.aincog.common.items.MultiTool;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
 import com.superRainbowNinja.aincog.proxys.ClientProxy;
 import com.superRainbowNinja.aincog.util.DamageUtil;
@@ -50,9 +51,7 @@ public class MultiToolBladeCap implements IMultiToolCapable, ICapabilityProvider
         } else {
             DamageUtil.playerAttack(player, (EntityLivingBase) entity, 2f * efficiency);
         }
-        if (cap.setCoreDamage(cap.getCoreDamage() + (int)Math.ceil(DURABILITY_PER_HIT*cap.getCoreItem().getEfficiency(stack)))) {
-            cap.loseCore();
-        }
+        ((MultiTool) stack.getItem()).damage(stack, (int)Math.ceil(DURABILITY_PER_HIT*cap.getCoreItem().getEfficiency(stack)), cap);
         return true;
     }
 

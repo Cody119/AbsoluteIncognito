@@ -120,13 +120,6 @@ public class PoweredWeapon extends CoreContainerItem {
         cap.setRecentTimeStamp(world.getTotalWorldTime());
     }
 
-    //set for both core and sword, maybe make defualt imp do this as well??
-    private void setDamage(ItemStack stack, int dmg, ICoreContainer cap) {
-        super.setDamage(stack, dmg);
-        if (cap.setCoreDamage(dmg)) {
-            loseCore(stack);
-        }
-    }
 /*
     @Override
     public NBTTagCompound getNBTShareTag(ItemStack thisStack) {
