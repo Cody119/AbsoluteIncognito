@@ -29,18 +29,29 @@ public class FakeInventory implements IInventory {
     }
 
     @Override
+    public boolean isEmpty() {
+        for (ItemStack itemstack : this.slotStacks) {
+            if (!itemstack.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public ItemStack getStackInSlot(int index) {
         return slotStacks[index];
     }
 
     @Override
     public ItemStack decrStackSize(int index, int count) {
-        if (slotStacks[index] != null)
+        if (!slotStacks[index].isEmpty())
         {
-            if (slotStacks[index].stackSize <= count)
+            if (slotStacks[index].getCount() <= count)
             {
                 ItemStack itemStack1 = slotStacks[index];
-                slotStacks[index] = null;
+                slotStacks[index] = ItemStack.EMPTY;
                 //this.markDirty();
                 return itemStack1;
             }
@@ -48,9 +59,9 @@ public class FakeInventory implements IInventory {
             {
                 ItemStack itemstack = slotStacks[index].splitStack(count);
 
-                if (slotStacks[index].stackSize == 0)
+                if (slotStacks[index].getCount() == 0)
                 {
-                    slotStacks[index] = null;
+                    slotStacks[index] = ItemStack.EMPTY;
                 }
 
                 //this.markDirty();
@@ -65,24 +76,19 @@ public class FakeInventory implements IInventory {
 
     @Override
     public ItemStack removeStackFromSlot(int index) {
-        if (this.slotStacks[index] != null)
-        {
-            ItemStack itemstack = slotStacks[index];
-            slotStacks[index] = null;
-            return itemstack;
+        ItemStack itemstack = slotStacks[index];
+        if (!slotStacks[index].isEmpty()) {
+            slotStacks[index] = ItemStack.EMPTY;
         }
-        else
-        {
-            return null;
-        }
+        return itemstack;
     }
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
         slotStacks[index] = stack;
 
-        if (stack != null && stack.stackSize > getInventoryStackLimit()) {
-            stack.stackSize = getInventoryStackLimit();
+        if (stack.getCount() > getInventoryStackLimit()) {
+            stack.setCount(getInventoryStackLimit());
         }
 
         //this.markDirty();
@@ -99,7 +105,7 @@ public class FakeInventory implements IInventory {
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUsableByPlayer(EntityPlayer player) {
         return true;
     }
 
@@ -140,7 +146,7 @@ public class FakeInventory implements IInventory {
     @Override
     public void clear() {
         for (int i = 0; i < getSizeInventory(); ++i) {
-            this.slotStacks[i] = null;
+            this.slotStacks[i] = ItemStack.EMPTY;
         }
     }
 

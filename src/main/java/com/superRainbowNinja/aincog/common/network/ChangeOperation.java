@@ -64,7 +64,7 @@ public class ChangeOperation implements IMessage {
             */
             final Minecraft mc = Minecraft.getMinecraft();
             mc.addScheduledTask(() -> {
-                TileEntity te = mc.theWorld.getTileEntity(message.pos);
+                TileEntity te = mc.world.getTileEntity(message.pos);
                 if (te instanceof IOperationTile) {
                     ((IOperationTile) te).changeTask(message.operation, message.tick);
                 } else {

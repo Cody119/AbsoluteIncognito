@@ -1,0 +1,6 @@
+{
+  "parent": "aincog:item/laser_sword",
+  "textures": {
+    "layer0": "aincog:items/wrench_blade"
+  }
+}

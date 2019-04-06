@@ -1,6 +1,11 @@
 package com.superRainbowNinja.aincog.common.items;
 
+import com.superRainbowNinja.aincog.util.LogHelper;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Created by SuperRainbowNinja on 7/12/2016.
@@ -62,5 +67,12 @@ public class MakeshiftCore extends CoreItem {
     @Override
     public float getStrength(ItemStack stack) {
         return 0.5f;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerModels() {
+        LogHelper.infoLog("added makeshiftcore");
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation("aincog:makeshift_core", "inventory"));
     }
 }

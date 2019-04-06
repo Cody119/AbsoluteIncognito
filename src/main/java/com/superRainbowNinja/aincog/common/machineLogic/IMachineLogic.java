@@ -3,21 +3,15 @@ package com.superRainbowNinja.aincog.common.machineLogic;
 import com.superRainbowNinja.aincog.client.models.tileEntityRenders.MachineFrameRender;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 

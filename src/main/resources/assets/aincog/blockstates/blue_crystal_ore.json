@@ -2,7 +2,7 @@
     "forge_marker": 1,
     "defaults": {
         "_comment" : "all the varients of this model are build using block/ore_base, so this stone is really a place holder",
-        "model": "stone"
+        "model": "aincog:ore_base"
     },
     "variants": {
         "normal": [{}],

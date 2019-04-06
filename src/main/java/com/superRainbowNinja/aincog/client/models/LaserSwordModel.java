@@ -19,6 +19,8 @@ import java.util.List;
  *
  * Laser sword model generator
  *
+ * TODO looks like models broken but i acctually think its the nbt, its not saving the core properly again
+ *      - If u throw it on the ground it loses its core
  */
 public class LaserSwordModel extends SmartModelOverride {
 
@@ -70,12 +72,16 @@ public class LaserSwordModel extends SmartModelOverride {
 //        }
 //
         if (hasCore) {
+            ArrayList<BakedQuad> tmp = new ArrayList<>();
+            tmp.addAll(handle.getQuads(state, side, rand));
+            tmp.addAll(core.getQuads(state, side, rand));
             if (isOn) {
-                return swordOn;
+                tmp.addAll(blade.getQuads(state, side, rand));
+                return tmp;
             } else {
-                return handleCore;
+                return tmp;
             }
         }
-        return handleBare;
+        return handle.getQuads(state, side, rand);
     }
 }

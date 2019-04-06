@@ -1,0 +1,8 @@
+{
+  "parent": "aincog:block/frame_base",
+  "textures": {
+    "0": "aincog:blocks/machine_frame",
+    "2": "aincog:blocks/machine_frame_detail",
+    "particle": "aincog:blocks/machine_frame"
+  }
+}

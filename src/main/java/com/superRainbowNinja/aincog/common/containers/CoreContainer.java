@@ -36,6 +36,8 @@ public class CoreContainer extends Container {
     private boolean canUse = true;
     private EntityPlayer player;
 
+    public int tmp;
+
     //called by client (the gui)
     public CoreContainer(EntityPlayer playerInv, int weaponSlotIn, boolean b) {
         this(playerInv, weaponSlotIn);
@@ -64,6 +66,7 @@ public class CoreContainer extends Container {
         // Player Inventory, Slot 0-8, Slot IDs 28-36
         for (int x = 0; x < 9; ++x) {
             if (x == weaponSlotIn) {
+                tmp = inventorySlots.size();
                 addSlotToContainer(new LockedSlot(playerInv, x, 8 + x * 18, 142));
             } else {
                 addSlotToContainer(new Slot(playerInv, x, 8 + x * 18, 142));
@@ -72,7 +75,7 @@ public class CoreContainer extends Container {
     }
 
     public void slotChange() {
-        if (player.inventory.getStackInSlot(itemSlot) == null) {
+        if (player.inventory.getStackInSlot(itemSlot).isEmpty()) {
             // This means the item disappeared from where we
             // excepted it to be.... not good
             // the code is in place 2 throw the whatever is in the core thisStack into the world
@@ -87,7 +90,7 @@ public class CoreContainer extends Container {
     public void closeInv(boolean throwItem) {
         if (throwItem) {
             ItemStack stack = inventorySlots.get(0).getStack();
-            if (stack != null) {
+            if (!stack.isEmpty()) {
                 player.dropItem(stack, false);
             }
         }
@@ -113,33 +116,58 @@ public class CoreContainer extends Container {
     //Look through this later, its prty standared for inventorys
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-        ItemStack previous = null;
+//        ItemStack previous = null;
+//        Slot slot = this.inventorySlots.get(fromSlot);
+//
+//        if (slot != null && slot.getHasStack()) {
+//            ItemStack current = slot.getStack();
+//            previous = current.copy();
+//
+//            if (fromSlot < 1) {
+//                // From TE Inventory to Player Inventory
+//                if (!this.mergeItemStack(current, 1, 37, true))
+//                    return null;
+//            } else {
+//                // From Player Inventory to TE Inventory
+//                if (!this.mergeItemStack(current, 0, 1, false))
+//                    return null;
+//            }
+//
+//            if (current.getCount() == 0)
+//                slot.putStack(null);
+//            else
+//                slot.onSlotChanged();
+//
+//            if (current.getCount() == previous.getCount())
+//                return null;
+//            slot.onPickupFromSlot(playerIn, current);
+//        }
+//        return previous;
+        ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(fromSlot);
 
         if (slot != null && slot.getHasStack()) {
             ItemStack current = slot.getStack();
-            previous = current.copy();
+            itemstack = current.copy();
 
             if (fromSlot < 1) {
-                // From TE Inventory to Player Inventory
-                if (!this.mergeItemStack(current, 1, 37, true))
-                    return null;
-            } else {
-                // From Player Inventory to TE Inventory
-                if (!this.mergeItemStack(current, 0, 1, false))
-                    return null;
+                if (!this.mergeItemStack(current, 1, this.inventorySlots.size(), true))
+                {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.mergeItemStack(current, 0, 1, false)) {
+                return ItemStack.EMPTY;
             }
 
-            if (current.stackSize == 0)
-                slot.putStack(null);
-            else
+            if (current.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
+            }
+            else {
                 slot.onSlotChanged();
-
-            if (current.stackSize == previous.stackSize)
-                return null;
-            slot.onPickupFromSlot(playerIn, current);
+            }
         }
-        return previous;
+
+        return itemstack;
     }
 
     public static class CoreSlot extends Slot {
@@ -151,8 +179,8 @@ public class CoreContainer extends Container {
         }
 
         @Override
-        public boolean isItemValid(@Nullable ItemStack stack) {
-            return stack != null && stack.getItem() instanceof ICore;
+        public boolean isItemValid(ItemStack stack) {
+            return stack.getItem() instanceof ICore;
         }
 
         @Override

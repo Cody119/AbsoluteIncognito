@@ -4,6 +4,7 @@ import com.superRainbowNinja.aincog.AIncogData;
 import com.superRainbowNinja.aincog.common.IRegistryEntry;
 import com.superRainbowNinja.aincog.common.blocks.AIBlockBase;
 import com.superRainbowNinja.aincog.refrence.Reference;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.ItemMeshDefinition;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -44,8 +46,8 @@ public class AIFluidBlock extends BlockFluidClassic implements IRegistryEntry{
     }
 
     @Override
-    public void registerObjects() {
-        GameRegistry.register(this);
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        event.getRegistry().register(this);
         //GameRegistry.register(this.item);
     }
 

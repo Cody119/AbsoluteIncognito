@@ -5,8 +5,10 @@ import com.superRainbowNinja.aincog.common.capabilites.ICoreContainer;
 import com.superRainbowNinja.aincog.common.containers.CoreContainer;
 import com.superRainbowNinja.aincog.common.network.GuiHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.CooldownTracker;
@@ -59,7 +61,7 @@ public class CoreContainerItem extends AIItemBase{
         if (container.isDirty() && !player.getEntityWorld().isRemote) {
             ICoreContainer cap = ICoreContainer.getCap(weapon);
             ItemStack core = container.getSlot(0).getStack();
-            if (core == null) {
+            if (core.isEmpty()) {
                 if (cap.hasCore()) {
                     loseCore(weapon);
                 }
@@ -68,6 +70,7 @@ public class CoreContainerItem extends AIItemBase{
                     ItemStack cCore = cap.getCoreItemStack();
                     if (!(ItemStack.areItemStacksEqual(cCore, core) && cCore.areCapsCompatible(core))) {
                         loseCore(weapon);
+
                         if (!trySetCore(weapon, core)) {
                             //setCore(weapon, cCore, cap);
                             container.closeInv(true);
@@ -142,13 +145,13 @@ public class CoreContainerItem extends AIItemBase{
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
         if (playerIn.isSneaking()) {
             if (!worldIn.isRemote) {
                 openGui(playerIn, worldIn);
             }
 
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+        return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
     }
 }

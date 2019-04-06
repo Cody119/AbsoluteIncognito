@@ -12,7 +12,7 @@ public abstract class CacheCap {
 
     public CacheCap() {
         isCached = false;
-        thisStack = null;
+        thisStack = ItemStack.EMPTY;
         LogHelper.infoLog("CacheCap created without item: " + this.toString());
     }
 

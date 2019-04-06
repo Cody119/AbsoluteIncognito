@@ -32,7 +32,7 @@ public class ItemStackHandler<T> extends FieldHandleImp<T, ItemStack> {
 
     @Override
     ItemStack readObject(NBTTagCompound compound) {
-        return ItemStack.loadItemStackFromNBT(compound.getCompoundTag(name));
+        return new ItemStack(compound.getCompoundTag(name));
     }
 
     @Override

@@ -32,7 +32,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
@@ -41,6 +40,7 @@ import java.util.ArrayList;
  * Fluid handler has been changed 2 a capability
  * TODO core chat channel
  * TODO maybe make componets render slightly closer (on y-axis) when theres only 2 layers?
+ * TODO better breaking/removing methods, more flexible
  */
 public class MachineFrameTile extends TileEntity implements ITickable, ISidedInventory, IEnergyHandler, IEnergyProvider, IEnergyReceiver, IRfUpdater {
     private static final int MAX_RF_SEND = 100;
@@ -53,7 +53,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     private ArrayList<IMachineComponent> components = new ArrayList<>(8);
     private ArrayList<ExactPosition> componentPositions = new ArrayList<>(8);
 
-    private ItemStack coreStack;
+    private ItemStack coreStack = ItemStack.EMPTY;
     private ICore core;
     private EnergyStorage energy;
     private boolean locked;
@@ -79,8 +79,8 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     public boolean wrench(EntityPlayer playerIn, EnumFacing facing, float hitX, float hitY, float hitZ) {
         removeFrame(playerIn.getPositionVector());
         ItemStack stack = tryRemoveComponent(hitX, hitY, hitZ);
-        if (stack != null) {
-            InvUtil.spawnItemStack(worldObj, pos, playerIn.getPositionVector(), stack);
+        if (stack != ItemStack.EMPTY) {
+            InvUtil.spawnItemStack(world, pos, playerIn.getPositionVector(), stack);
         }
         return true;
     }
@@ -164,11 +164,11 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     }
 
     public boolean hasCore() {
-        return coreStack != null;
+        return !coreStack.isEmpty();
     }
     //a machine may have a core that is "not functional" (like a rf powered core that has no rf left)
     public boolean coreIsFunctional() {
-        return coreStack != null && core.coreIsFunctional(coreStack);
+        return !coreStack.isEmpty() && core.coreIsFunctional(coreStack);
     }
 
     public Operation getCurOp() {
@@ -190,7 +190,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     //Setters that can fail
 
     public boolean trySetCore(ItemStack core) {
-        if (!hasCore() && core != null && core.getItem() instanceof ICore) {
+        if (!hasCore() && !core.isEmpty() && core.getItem() instanceof ICore) {
             setCore(core);
             markVisualDirty();
             return true;
@@ -239,13 +239,21 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
                 return removeComponent(i);
             }
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     public void resizeInv(int size) {
         if (inv.length != size) {
             ItemStack newInv[] = new ItemStack[size];
-            System.arraycopy(inv, 0, newInv, 0, Math.min(inv.length, size));
+            if (inv.length < size) {
+                System.arraycopy(inv, 0, newInv, 0, inv.length);
+                for (int i = inv.length; i < size; i++) {
+                    newInv[i] = ItemStack.EMPTY;
+                }
+            } else {
+                System.arraycopy(inv, 0, newInv, 0, size);
+            }
+
             inv = newInv;
             this.markVisualDirty();
         }
@@ -266,18 +274,18 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         markVisualDirty();
     }
 
-    private void setCore(@Nullable ItemStack coreIn) {
-        if (coreIn != null) {
+    private void setCore(ItemStack coreIn) {
+        if (!coreIn.isEmpty()) {
             coreStack = coreIn.copy();
             core = (ICore) coreStack.getItem();
         } else {
-            coreStack = null;
+            coreStack = ItemStack.EMPTY;
             core = null;
         }
     }
 
     private void removeCore() {
-        setCore(null);
+        setCore(ItemStack.EMPTY);
         if (locked) {
             logic.coreRemoved();
         }
@@ -291,13 +299,13 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     |  Public Methods           |
     ----------------------------*/
 
-    public boolean playerActivate(IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean playerActivate(IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 
 
-        if (heldItem != null) {
+        if (!heldItem.isEmpty()) {
             if (trySetCore(heldItem)) {
                 if (!playerIn.isCreative()) {
-                    playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, null);
+                    playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, ItemStack.EMPTY);
                 }
                 return true;
             }
@@ -310,14 +318,14 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         }
 
         if (locked) {
-            if (heldItem != null) {
+            if (!heldItem.isEmpty()) {
                 logic.insertItem(playerIn, hand, heldItem, side, hitX, hitY, hitZ);
             } else {
                 logic.removeItem(playerIn, side, hitX, hitY, hitZ);
             }
         } else {
             //machine is not valid
-            if (heldItem != null) {
+            if (!heldItem.isEmpty()) {
                 Item item = heldItem.getItem();
                 if (item instanceof IMachineComponent) {
                     tryAddComponent((IMachineComponent) item, heldItem, hitX, hitY, hitZ);
@@ -336,8 +344,8 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     //note that this may cause the core to be removed or become inactive
     public void damageCore(int dmg) {
-        if (coreStack != null && core.setCoreDamage(coreStack, core.getCoreDamage(coreStack) + dmg)) {
-            coreBreakParticles(worldObj, pos);
+        if (!coreStack.isEmpty() && core.setCoreDamage(coreStack, core.getCoreDamage(coreStack) + dmg)) {
+            coreBreakParticles(world, pos);
             removeCore();
         }
     }
@@ -419,7 +427,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
             if (item.getItem() instanceof IMachineComponent) {
                 components.add((IMachineComponent) item.getItem());
             } else {
-                components.add(null);
+                //components.add(null);
                 LogHelper.errorLog("TE at " + getPos().toString() + " had incorrect components, r u running the correct version? or was save data corrupt");
             }
         }
@@ -446,36 +454,36 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
 
     //NOTE THIS METHODS DROP, THEY DO NOT REMOVE STUFF FROM THE TE
     public void dropInventory() {
-        InventoryHelper.dropInventoryItems(worldObj, pos, this);
+        InventoryHelper.dropInventoryItems(world, pos, this);
     }
 
     public void dropLock() {
         if (locked) {
-            InventoryHelper.spawnItemStack(worldObj, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(AIncogData.MACHINE_LOCK, 1));
+            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(AIncogData.MACHINE_LOCK, 1));
         }
     }
 
     public void dropLock(Vec3d vec) {
         if (locked) {
-            InvUtil.spawnItemStack(worldObj, getPos(), vec, new ItemStack(AIncogData.MACHINE_LOCK, 1));
+            InvUtil.spawnItemStack(world, getPos(), vec, new ItemStack(AIncogData.MACHINE_LOCK, 1));
         }
     }
 
     public void dropComponents() {
         for (ItemStack stack : componentItems) {
-            InventoryHelper.spawnItemStack(worldObj, pos.getX(), pos.getY(), pos.getZ(), stack);
+            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
         }
     }
 
     public void dropComponents(Vec3d vec) {
         for (ItemStack stack : componentItems) {
-            InvUtil.spawnItemStack(worldObj, getPos(), vec, stack);
+            InvUtil.spawnItemStack(world, getPos(), vec, stack);
         }
     }
 
     public void dropCore() {
         if (hasCore()) {
-            InventoryHelper.spawnItemStack(worldObj, pos.getX(), pos.getY(), pos.getZ(), getCoreStack());
+            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), getCoreStack());
         }
     }
 
@@ -495,7 +503,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         if (locked && coreIsFunctional())
             logic.tick();
 
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
 
             if (/*batteryBehaviour != BatteryBehaviour.ACCEPT &&*/ EnergyUtils.sendEnergyToSides(getWorld(), getPos(), energy, MAX_RF_SEND)) {
                 markRfUpdate();
@@ -514,8 +522,8 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
                 markDirty();
             }
 
-            if (locked && worldObj.getWorldTime() % 10 == 0) {
-                logic.spawnParticles(((WorldServer) worldObj), pos);
+            if (locked && world.getWorldTime() % 10 == 0) {
+                logic.spawnParticles(((WorldServer) world), pos);
             }
         }
 
@@ -565,17 +573,26 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         return inv.length;
     }
 
-    @Nullable
+    @Override
+    public boolean isEmpty() {
+        for (ItemStack itemstack : inv) {
+            if (!itemstack.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public ItemStack getStackInSlot(int index) {
         return inv[index];
     }
 
-    @Nullable
     @Override
     public ItemStack decrStackSize(int index, int count) {
         ItemStack ret = inv[index].splitStack(count);
-        if (inv[index].stackSize == 0) {
+        if (inv[index].getCount() == 0) {
             removeStack(index);
         } else {
             markInvDirty();
@@ -583,7 +600,7 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
         return ret;
     }
 
-    @Nullable
+
     @Override
     public ItemStack removeStackFromSlot(int index) {
         ItemStack ret = inv[index];
@@ -592,12 +609,12 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     }
 
     private void removeStack(int slot) {
-        inv[slot] = null;
+        inv[slot] = ItemStack.EMPTY;
         markInvDirty();
     }
 //TODO separate update if just the thisStack size changes?
     @Override
-    public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
+    public void setInventorySlotContents(int index, ItemStack stack) {
         inv[index] = stack;
         markInvDirty();
     }
@@ -608,9 +625,9 @@ public class MachineFrameTile extends TileEntity implements ITickable, ISidedInv
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUsableByPlayer(EntityPlayer player) {
         /* stole from the chest, dont think i need it though (well intelij simplified it apparently, which is awesome) */
-        return this.worldObj.getTileEntity(this.pos) == this && player.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
+        return this.world.getTileEntity(this.pos) == this && player.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
     @Override

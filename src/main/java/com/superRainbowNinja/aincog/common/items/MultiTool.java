@@ -39,8 +39,9 @@ public class MultiTool extends CoreContainerItem {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         IBlockState state = worldIn.getBlockState(pos);
+        ItemStack stack = playerIn.getHeldItem(hand);
         TileEntity tile;
         if (!worldIn.isRemote) {
             boolean countDown = false;
@@ -87,7 +88,7 @@ public class MultiTool extends CoreContainerItem {
     @SideOnly(Side.CLIENT)
     public static class CoreColor implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             //should be assured that the sword has a core as the rest of the model has no tint index
             if (ICoreContainer.hasCore(stack)) {
                 return tintIndex == 1 ? ICoreContainer.getCap(stack).getCoreItem().getPrimaryColor(stack) :

@@ -15,12 +15,12 @@ import net.minecraft.world.World;
 public abstract class AITEBase extends AIBlockBase implements ITileEntityProvider {
     public AITEBase(String name) {
         super(name);
-        this.isBlockContainer = true;
+        this.hasTileEntity = true;
     }
 
     public AITEBase(String name, Material material) {
         super(name, material);
-        this.isBlockContainer = true;
+        this.hasTileEntity = true;
     }
 
     //@Override

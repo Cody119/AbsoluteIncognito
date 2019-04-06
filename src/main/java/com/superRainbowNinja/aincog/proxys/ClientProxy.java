@@ -19,12 +19,14 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 import com.superRainbowNinja.aincog.common.items.PoweredWeapon;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -32,40 +34,39 @@ import java.util.List;
  */
 public class ClientProxy extends CommonProxy {
     public static final CrystalOre.ModelBuilder CRYSTAL_ORE_MODELS = new CrystalOre.ModelBuilder();
-    public static final CrystalBase.ModelBuilder CRYSTAL_MODELS = new CrystalBase.ModelBuilder();
-    public static final BasicCore.ModelBuilder BASIC_CORE_MODELS = new BasicCore.ModelBuilder();
 
     public static final ModelResourceLocation MULTI_BLADE_RECOURCE = new ModelResourceLocation(Reference.MOD_ID + ":" + "multi_tool_blade", "inventory");
     public static List<BakedQuad> MULTI_BLADE_MODEL = null;
 
     public static final IRegistryEntry MULTI_TOOL_SWORD = new IRegistryEntry() {
-
-        @Override
-        public void registerObjects() {}
-
         @Override
         public void registerModels() {
             ModelBakery.registerItemVariants(AIncogData.MULTI_TOOL, MULTI_BLADE_RECOURCE);
         }
     };
 
+    public void registerModels() {
+        registryEntries.forEach(IRegistryEntry::registerModels);
+    }
+
     @Override
-    public void initRegistryEntry() {
-        super.initRegistryEntry();
+    public void preInit() {
+        super.preInit();
 
         add(MULTI_TOOL_SWORD);
         //its important that this is registered before the actual ores
         AbsoluteModelRegistry.INSTANCE.registerModelEntry(CRYSTAL_ORE_MODELS);
-        AbsoluteModelRegistry.INSTANCE.registerModelEntry(CRYSTAL_MODELS);
-        AbsoluteModelRegistry.INSTANCE.registerModelEntry(BASIC_CORE_MODELS);
-        registryEntries.forEach(IRegistryEntry::registerModels);
+        //AbsoluteModelRegistry.INSTANCE.registerModelEntry(CRYSTAL_MODELS);
+
 
         //this loads on the server side for some reason, as far as ik it shouldnt so i muct be missing something?
         //will fix later, for now so long as its called dosent really matter where it is
+
+        //TODO put these back
         AbsoluteModelRegistry.INSTANCE.registerModelModelBakeEventSub(PoweredWeapon.HANDLE, (event) -> {
             IBakedModel existingModel = event.getModelRegistry().getObject(PoweredWeapon.HANDLE);
             //Sword model setup
-            event.getModelRegistry().putObject(PoweredWeapon.HANDLE, new SmartModel((IPerspectiveAwareModel)existingModel,
+            event.getModelRegistry().putObject(PoweredWeapon.HANDLE, new SmartModel(existingModel,
                     new LaserSwordModel(
                             QuadUtil.addItemTint(existingModel, -1),//gotta remove the index already added
                             QuadUtil.addItemTint(event.getModelRegistry().getObject(PoweredWeapon.BLADE), 2),
@@ -77,7 +78,7 @@ public class ClientProxy extends CommonProxy {
         AbsoluteModelRegistry.INSTANCE.registerModelModelBakeEventSub(MultiTool.HANDLE, (event) -> {
             IBakedModel existingModel = event.getModelRegistry().getObject(MultiTool.HANDLE);
             //Sword model setup
-            event.getModelRegistry().putObject(MultiTool.HANDLE, new SmartModel((IPerspectiveAwareModel)existingModel,
+            event.getModelRegistry().putObject(MultiTool.HANDLE, new SmartModel(existingModel,
                     new MultiToolModel(
                             QuadUtil.addItemTint(existingModel, -1),//gotta remove the index already added
                             QuadUtil.addItemTint(event.getModelRegistry().getObject(MultiTool.OVERLAY), 2),
@@ -114,6 +115,8 @@ public class ClientProxy extends CommonProxy {
         super.postInit();
 
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new MachineFrame.CoreColor() , AIncogData.MACHINE_FRAME.item);
+
+        //TODO put these back
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new PoweredWeapon.CoreColor() , AIncogData.LASER_SWORD);
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new MultiTool.CoreColor() , AIncogData.MULTI_TOOL);
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new MakeshiftCore.CoreColor(), AIncogData.MAKESHIFT_CORE);
@@ -143,5 +146,17 @@ public class ClientProxy extends CommonProxy {
         color = AIncogData.BLUE_CRYSTAL_ORE.getOreColor();
         Minecraft.getMinecraft().getItemColors().registerItemColorHandler(color, AIncogData.BLUE_CRYSTAL_ORE.item);
         Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(color, AIncogData.BLUE_CRYSTAL_ORE);
+    }
+
+    @Nonnull
+    @Override
+    public ClientProxy getClientProxy() {
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ServerProxy getServerProxy() {
+        throw new RuntimeException("Client proxy asked for server proxy..... which cant happen");
     }
 }

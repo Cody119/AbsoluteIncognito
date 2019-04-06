@@ -44,34 +44,13 @@ public class AIncogData {
     //creative tab
     public static final CreativeTabs A_INCOG_C_Tab = new CreativeTabs(Reference.MOD_ID) {
         @Override
-        public Item getTabIconItem() {
-            return AIncogData.MACHINE_FRAME.item;
+        public ItemStack getTabIconItem() {
+            return new ItemStack(AIncogData.MACHINE_FRAME.item);
         }
     };
 
     //blocks
     public static final MachineFrame MACHINE_FRAME = new MachineFrame();
-    public static final AIBlockBase GLOW_TEST = new SimpleGlowingBlock("glow_test");
-
-    public static class SimpleGlowingBlock extends AIBlockBase {
-
-        public SimpleGlowingBlock(String name) {
-            super(name);
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public BlockRenderLayer getBlockLayer() {
-            return BlockRenderLayer.CUTOUT_MIPPED;
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public void registerModels() {
-            super.registerModels();
-            AbsoluteModelRegistry.INSTANCE.buildAndAddGlowingTexture(new ModelResourceLocation(getRegistryName().toString()), new ResourceLocation("aincog:blocks/gen_ore"), 1);
-        }
-    }
 
     // items
     public static final PoweredWeapon LASER_SWORD = new PoweredWeapon("laser_sword", 2000);
@@ -155,9 +134,24 @@ public class AIncogData {
     public static final CrystalOre GREEN_CRYSTAL_ORE = new CrystalOre("green_crystal_ore", 0xFF00FF00, GREEN_CRYSTAL);
     public static final CrystalOre BLUE_CRYSTAL_ORE = new CrystalOre("blue_crystal_ore", 0xFF0000FF, BLUE_CRYSTAL);
 
-    public static void intiStatics() {
+    public static void init() {
+
+        CommonProxy.add(WHITE_CRYSTAL);
+        CommonProxy.add(RED_CRYSTAL);
+        CommonProxy.add(GREEN_CRYSTAL);
+        CommonProxy.add(BLUE_CRYSTAL);
+
+//        CommonProxy.add(WHITE_CRYSTAL_FLUID_BLOCK);
+//        CommonProxy.add(GREEN_CRYSTAL_FLUID_BLOCK);
+//        CommonProxy.add(RED_CRYSTAL_FLUID_BLOCK);
+//        CommonProxy.add(BLUE_CRYSTAL_FLUID_BLOCK);
+
+        CommonProxy.add(WHITE_CRYSTAL_ORE);
+        CommonProxy.add(RED_CRYSTAL_ORE);
+        CommonProxy.add(GREEN_CRYSTAL_ORE);
+        CommonProxy.add(BLUE_CRYSTAL_ORE);
+
         CommonProxy.add(MACHINE_FRAME);
-        CommonProxy.add(GLOW_TEST);
 
         CommonProxy.add(MULTI_TOOL);
         CommonProxy.add(LASER_SWORD);
@@ -172,45 +166,33 @@ public class AIncogData {
         CommonProxy.add(GREEN_BASIC_CORE);
         CommonProxy.add(BLUE_BASIC_CORE);
 
-        CommonProxy.add(WHITE_CRYSTAL);
-        CommonProxy.add(RED_CRYSTAL);
-        CommonProxy.add(GREEN_CRYSTAL);
-        CommonProxy.add(BLUE_CRYSTAL);
 
-        CommonProxy.add(WHITE_CRYSTAL_FLUID_BLOCK);
-        CommonProxy.add(GREEN_CRYSTAL_FLUID_BLOCK);
-        CommonProxy.add(RED_CRYSTAL_FLUID_BLOCK);
-        CommonProxy.add(BLUE_CRYSTAL_FLUID_BLOCK);
-
-        CommonProxy.add(WHITE_CRYSTAL_ORE);
-        CommonProxy.add(RED_CRYSTAL_ORE);
-        CommonProxy.add(GREEN_CRYSTAL_ORE);
-        CommonProxy.add(BLUE_CRYSTAL_ORE);
     }
 
     public static void initRecipes() {
-        if (OreDictionary.doesOreNameExist(OreDictNames.COPPER_INGOT)) {
-            GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.COIL, "III", "IBI", "III", 'I', OreDictNames.COPPER_INGOT, 'B', Blocks.IRON_BARS));
-        } else {
-            GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.COIL, "III", "IBI", "III", 'I', "ingotIron", 'B', Blocks.IRON_BARS));
-        }
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MACHINE_FRAME, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', Blocks.IRON_BARS, 'R', "dustRedstone"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MACHINE_FRAME, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', Blocks.IRON_BARS, 'R', "dustRedstone"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MACHINE_LOCK, "BBB", "BGB", "BBB", 'G', "blockGlass", 'B', Blocks.IRON_BARS));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MAKESHIFT_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', "stickWood", 'R', "dustRedstone"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.MAKESHIFT_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', "stickWood", 'R', "dustRedstone"));
-
-        GameRegistry.addRecipe(new ShapelessOreRecipe(AIncogData.PIECE, Blocks.IRON_BARS, Blocks.IRON_BARS, Blocks.IRON_BARS));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.TANK_COMPONENT, "III", "IBI", "III", 'I', "blockGlass", 'B', Blocks.IRON_BARS));
-
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.WHITE_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.WHITE_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.WHITE_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.WHITE_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.RED_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.RED_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.RED_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.RED_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.GREEN_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.GREEN_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.GREEN_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.GREEN_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.BLUE_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.BLUE_CRYSTAL, 'R', "ingotGold"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(AIncogData.BLUE_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.BLUE_CRYSTAL, 'R', "ingotGold"));
+//        if (OreDictionary.doesOreNameExist(OreDictNames.COPPER_INGOT)) {
+//            GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.COIL, "III", "IBI", "III", 'I', OreDictNames.COPPER_INGOT, 'B', Blocks.IRON_BARS));
+//        } else {
+//            GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.COIL, "III", "IBI", "III", 'I', "ingotIron", 'B', Blocks.IRON_BARS));
+//        }
+//
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.MACHINE_FRAME, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', Blocks.IRON_BARS, 'R', "dustRedstone"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.MACHINE_FRAME, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', Blocks.IRON_BARS, 'R', "dustRedstone"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.MACHINE_LOCK, "BBB", "BGB", "BBB", 'G', "blockGlass", 'B', Blocks.IRON_BARS));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.MAKESHIFT_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', "stickWood", 'R', "dustRedstone"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.MAKESHIFT_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', "stickWood", 'R', "dustRedstone"));
+//
+//        GameRegistry.addShapedRecipe(new ShapelessOreRecipe(AIncogData.PIECE, Blocks.IRON_BARS, Blocks.IRON_BARS, Blocks.IRON_BARS));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.TANK_COMPONENT, "III", "IBI", "III", 'I', "blockGlass", 'B', Blocks.IRON_BARS));
+//
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.WHITE_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.WHITE_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.WHITE_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.WHITE_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.RED_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.RED_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.RED_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.RED_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.GREEN_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.GREEN_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.GREEN_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.GREEN_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.BLUE_BASIC_CORE, "IBI", "BRB", "IBI", 'B', "ingotIron", 'I', AIncogData.BLUE_CRYSTAL, 'R', "ingotGold"));
+//        GameRegistry.addShapedRecipe(new ShapedOreRecipe(AIncogData.BLUE_BASIC_CORE, "BIB", "IRI", "BIB", 'B', "ingotIron", 'I', AIncogData.BLUE_CRYSTAL, 'R', "ingotGold"));
 
         OreFormerLogic.addRecipe(AssortedUtil.fluidStack(WHITE_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), WHITE_CRYSTAL_ORE.getDefaultState());
         OreFormerLogic.addRecipe(AssortedUtil.fluidStack(GREEN_CRYSTAL_FLUID.name, OreFormerLogic.FLUID_PER_ORE), GREEN_CRYSTAL_ORE.getDefaultState());

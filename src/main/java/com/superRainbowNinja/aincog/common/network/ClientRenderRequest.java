@@ -58,7 +58,7 @@ public class ClientRenderRequest extends TileEntityPacket {
             }
 
             //cant instantly reply as we are on the network thread and hence cant access the TE data
-            final EntityPlayerMP sendingPlayer = ctx.getServerHandler().playerEntity;
+            final EntityPlayerMP sendingPlayer = ctx.getServerHandler().player;
             if (sendingPlayer == null) {
                 LogHelper.errorLog("EntityPlayerMP was null when Client reguest was received");
                 return null;

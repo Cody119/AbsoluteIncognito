@@ -1,7 +1,7 @@
 {
     "forge_marker": 1,
     "defaults": {
-        "_comment" : "all the varients of this model are build using block/ore_base, so this stone is really a place holder",
+        "_comment" : "this is only the base model, glowing quads are added programmatically",
         "model": "stone"
     },
     "variants": {

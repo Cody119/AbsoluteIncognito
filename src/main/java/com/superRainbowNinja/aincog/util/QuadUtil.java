@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -67,7 +66,7 @@ public class QuadUtil {
     }
 
     public static IBakedModel addGlowingQuads(IBakedModel oldModel, TextureAtlasSprite sprite, TextureAtlasSprite particleTexture, int RGBA, int tint) {
-        return new GlowingBlockItemModel((IPerspectiveAwareModel) oldModel,
+        return new GlowingBlockItemModel(oldModel,
                 generateGlowingQuads(RGBA, tint, sprite),
                 generateNormalQuads(RGBA, tint, sprite),
                 particleTexture);

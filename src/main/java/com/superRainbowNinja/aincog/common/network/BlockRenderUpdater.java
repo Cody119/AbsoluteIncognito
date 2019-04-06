@@ -70,7 +70,7 @@ public class BlockRenderUpdater extends TileEntityPacket {
 
             final Minecraft mc = Minecraft.getMinecraft();
             mc.addScheduledTask(() -> {
-                TileEntity te = mc.theWorld.getTileEntity(message.getPos());
+                TileEntity te = mc.world.getTileEntity(message.getPos());
                 if (te instanceof MachineFrameTile) {
                     //((IMachineInfoProvider) te).updateMachine(message.getData());
                     MachineFrameTile.DATA_HANDLE.readFromCache(message.getData(), ((MachineFrameTile) te));

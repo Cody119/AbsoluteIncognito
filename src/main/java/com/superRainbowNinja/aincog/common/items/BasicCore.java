@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -98,8 +99,7 @@ public class BasicCore extends CoreItem {
     @Override
     @SideOnly(Side.CLIENT)
     public void registerModels() {
-        super.registerModels();
-        AbsoluteModelRegistry.INSTANCE.registerModelReplacer(new ModelResourceLocation(getRegistryName().toString(), "inventory"), () -> ClientProxy.BASIC_CORE_MODELS.coreModel);
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation("aincog:core_basic", "inventory"));
     }
 
     @SideOnly(Side.CLIENT)
@@ -110,25 +110,12 @@ public class BasicCore extends CoreItem {
     @SideOnly(Side.CLIENT)
     public class CoreColor implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             //return Color.HSBtoRGB((Minecraft.getMinecraft().theWorld.getWorldTime() % 360)/360f, 0.9f, 0.7f);
             return
                     tintIndex == 0 ? primaryColor :
                     tintIndex == 1 ? secondaryColor :
                     outlineColor;
-        }
-    }
-
-    public static class ModelBuilder implements AbsoluteModelRegistry.IModelEntry {
-
-        public IBakedModel coreModel;
-
-        @Override
-        public void handleTextureStitch(TextureStitchEvent.Pre e) {}
-
-        @Override
-        public void handleModelBake(ModelBakeEvent e) {
-            coreModel =  AbsoluteModelRegistry.getBakedModel(new ResourceLocation("aincog:item/core_basic"));
         }
     }
 }

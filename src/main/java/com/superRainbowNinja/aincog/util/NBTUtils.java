@@ -133,12 +133,12 @@ public final class NBTUtils {
             int j = nbttagcompound.getByte("Slot");
 
             if (j >= 0 && j < size) {
-                inv.setInventorySlotContents(j, ItemStack.loadItemStackFromNBT(nbttagcompound.getCompoundTag("Content")));
+                inv.setInventorySlotContents(j, new ItemStack(nbttagcompound.getCompoundTag("Content")));
             }
         }
     }
 
-    public static final Function<NBTBase, ItemStack> getItemStack = (tag) -> ItemStack.loadItemStackFromNBT((NBTTagCompound) tag);
+    public static final Function<NBTBase, ItemStack> getItemStack = (tag) -> new ItemStack((NBTTagCompound) tag);
     public static final Function<ItemStack, NBTBase> getItemStackTag = (item) -> item.writeToNBT(new NBTTagCompound());
 
     public static final Function<NBTBase, ExactPosition> getPosition = (tag) -> new ExactPosition((NBTTagCompound) tag);

@@ -55,7 +55,7 @@ public class RfUpdate extends TileEntityPacket {
 
             final Minecraft mc = Minecraft.getMinecraft();
             mc.addScheduledTask(() -> {
-                TileEntity te = mc.theWorld.getTileEntity(message.pos);
+                TileEntity te = mc.world.getTileEntity(message.pos);
                 if (te instanceof IRfUpdater) {
                     ((IRfUpdater) te).receiveUpdate(message.power);
                 } else {

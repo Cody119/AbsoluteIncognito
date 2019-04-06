@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,8 +32,8 @@ public class CrystalBase extends AIItemBase{
     @Override
     @SideOnly(Side.CLIENT)
     public void registerModels() {
-        super.registerModels();
-        AbsoluteModelRegistry.INSTANCE.registerModelReplacer(new ModelResourceLocation(getRegistryName().toString(), "inventory"), () -> ClientProxy.CRYSTAL_MODELS.crystalModel);
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation("aincog:crystal", "inventory"));
+        //AbsoluteModelRegistry.INSTANCE.registerModelReplacer(new ModelResourceLocation(getRegistryName().toString(), "inventory"), () -> ClientProxy.CRYSTAL_MODELS.crystalModel);
     }
 
     @SideOnly(Side.CLIENT)
@@ -43,22 +44,22 @@ public class CrystalBase extends AIItemBase{
     @SideOnly(Side.CLIENT)
     public class CoreColor implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             //return Color.HSBtoRGB((Minecraft.getMinecraft().theWorld.getWorldTime() % 360)/360f, 0.9f, 0.7f);
             return color;
         }
     }
 
-    public static class ModelBuilder implements AbsoluteModelRegistry.IModelEntry {
-
-        public IBakedModel crystalModel;
-
-        @Override
-        public void handleTextureStitch(TextureStitchEvent.Pre e) {}
-
-        @Override
-        public void handleModelBake(ModelBakeEvent e) {
-            crystalModel =  AbsoluteModelRegistry.getBakedModel(new ResourceLocation("aincog:item/crystal"));
-        }
-    }
+//    public static class ModelBuilder implements AbsoluteModelRegistry.IModelEntry {
+//
+//        public IBakedModel crystalModel;
+//
+//        @Override
+//        public void handleTextureStitch(TextureStitchEvent.Pre e) {}
+//
+//        @Override
+//        public void handleModelBake(ModelBakeEvent e) {
+//            crystalModel =  AbsoluteModelRegistry.getBakedModel(new ResourceLocation("aincog:item/crystal"));
+//        }
+//    }
 }

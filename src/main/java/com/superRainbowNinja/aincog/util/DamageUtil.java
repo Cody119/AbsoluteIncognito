@@ -19,8 +19,8 @@ public class DamageUtil {
         * flag3 is set 2 true when the item is a sword
         */
 
-        for (EntityLivingBase entitylivingbase : player.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, primaryEntity.getEntityBoundingBox().expand(1.0D, 0.25D, 1.0D))) {
-            if (entitylivingbase != player && !player.isOnSameTeam(entitylivingbase) && (player.getDistanceSqToEntity(entitylivingbase) < 9.0D || entitylivingbase == primaryEntity)) {
+        for (EntityLivingBase entitylivingbase : player.world.getEntitiesWithinAABB(EntityLivingBase.class, primaryEntity.getEntityBoundingBox().expand(1.0D, 0.25D, 1.0D))) {
+            if (entitylivingbase != player && !player.isOnSameTeam(entitylivingbase) && (player.getDistance(entitylivingbase) < 9.0D || entitylivingbase == primaryEntity)) {
                 DamageUtil.playerAttack(player, entitylivingbase, mainDmg * (entitylivingbase == primaryEntity ? 1f : dmgMod));
             }
         }
@@ -28,7 +28,7 @@ public class DamageUtil {
     }
 
     public static void doSwordSwingParticlesSound(EntityPlayer player) {
-        player.worldObj.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
+        player.world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
         player.spawnSweepParticles();
     }
 

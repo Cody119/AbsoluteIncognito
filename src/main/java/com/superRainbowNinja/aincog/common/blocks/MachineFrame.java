@@ -49,7 +49,7 @@ public class MachineFrame extends AITEBase {
     @SideOnly(Side.CLIENT)
     public static class CoreColor implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             return 0xFFFFFFFF;
         }
     }
@@ -69,12 +69,12 @@ public class MachineFrame extends AITEBase {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (worldIn.isRemote)
             return true;
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof MachineFrameTile) {
-            ((MachineFrameTile) te).playerActivate(state, playerIn, hand, heldItem, side, hitX, hitY, hitZ);
+            ((MachineFrameTile) te).playerActivate(state, playerIn, hand, playerIn.getHeldItem(hand), facing, hitX, hitY, hitZ);
         }
         return true;
     }
@@ -119,10 +119,4 @@ public class MachineFrame extends AITEBase {
     }
 
     public static ModelResourceLocation MACHINE_FRAME = new ModelResourceLocation(Reference.MOD_ID + ":" + "machine_frame");
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerModels() {
-        super.registerModels();
-    }
 }

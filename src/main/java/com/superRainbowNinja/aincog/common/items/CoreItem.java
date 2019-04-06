@@ -28,7 +28,7 @@ public abstract class CoreItem extends AIItemBase implements ICore {
     @SideOnly(Side.CLIENT)
     public static class CoreColor implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             ICore core = (ICore) stack.getItem();
             return tintIndex == 0 ? core.getPrimaryColor(stack) : tintIndex == 1 ? core.getSecondaryColor(stack) : core.getOutlineColor(stack);
         }

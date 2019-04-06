@@ -35,8 +35,8 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
     @Override
     public void cache() {
         super.cache();
-        if (core != null) {
-            NBTTagCompound compound = thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true);
+        if (!core.isEmpty()) {
+            NBTTagCompound compound = thisStack.getTagCompound().getCompoundTag(POWERED_WEAPON_CAP_KEY);
             if (state = compound.getBoolean(WEAPON_STATE)) {
                 recTimeStamp = compound.getLong(REC_TIME_KEY);
                 dimId = compound.getInteger(DIM_ID_KEY);
@@ -48,7 +48,7 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
     public void setRecentTimeStamp(long time) {
         cacheCheck();
         recTimeStamp = time;
-        thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setLong(REC_TIME_KEY, time);
+        thisStack.getTagCompound().getCompoundTag(POWERED_WEAPON_CAP_KEY).setLong(REC_TIME_KEY, time);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
     public void setDimensionId(int id) {
         cacheCheck();
         dimId = id;
-        thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setInteger(DIM_ID_KEY, id);
+        thisStack.getTagCompound().getCompoundTag(POWERED_WEAPON_CAP_KEY).setInteger(DIM_ID_KEY, id);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class PoweredWeaponCapImp extends CoreContainerImp implements IPoweredWea
     public void setState(boolean cur) {
         cacheCheck();
         state = cur;
-        thisStack.getSubCompound(POWERED_WEAPON_CAP_KEY, true).setBoolean(WEAPON_STATE, cur);
+        thisStack.getTagCompound().getCompoundTag(POWERED_WEAPON_CAP_KEY).setBoolean(WEAPON_STATE, cur);
     }
 
     @Override

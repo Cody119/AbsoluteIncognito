@@ -2,9 +2,16 @@ package com.superRainbowNinja.aincog.proxys;
 
 import com.superRainbowNinja.aincog.common.IRegistryEntry;
 import com.superRainbowNinja.aincog.common.tileEntity.MachineFrameTile;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 
 /**
  * Created by SuperRainbowNinja on 3/10/2016.
@@ -18,8 +25,22 @@ public abstract class CommonProxy {
         return item;
     }
 
-    public void initRegistryEntry() {
-        registryEntries.forEach(IRegistryEntry::registerObjects);
+    public void preInit() {
+        //registryEntries.forEach(IRegistryEntry::registerObjects);
+    }
+
+    protected  <T extends IForgeRegistryEntry<T>> void registerAll(RegistryEvent.Register<T> event, BiConsumer<IRegistryEntry, RegistryEvent.Register<T>> consumer) {
+        for (IRegistryEntry entry : registryEntries) {
+            consumer.accept(entry, event);
+        }
+    }
+
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        registerAll(event, IRegistryEntry::registerBlocks);
+    }
+
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        registerAll(event, IRegistryEntry::registerItems);
     }
 
     public void initTEs() {
@@ -39,4 +60,7 @@ public abstract class CommonProxy {
 
     public void postInit() {
     }
+
+    @Nonnull public abstract ClientProxy getClientProxy();
+    @Nonnull public abstract ServerProxy getServerProxy();
 }

@@ -1,5 +1,6 @@
 package com.superRainbowNinja.aincog.server;
 
+import com.superRainbowNinja.aincog.util.LogHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -7,6 +8,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidRegistry;
+import sun.rmi.runtime.Log;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -24,17 +26,17 @@ public class DebugCommand implements ICommand{
     }
 
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "aiDebug";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender) {
+    public String getUsage(ICommandSender sender) {
         return "aiDebug";
     }
 
     @Override
-    public List<String> getCommandAliases() {
+    public List<String> getAliases() {
         return names;
     }
 
@@ -42,7 +44,8 @@ public class DebugCommand implements ICommand{
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         //System.out.println(Minecraft.getMinecraft().theWorld.getCombinedLight(sender.getCommandSenderEntity().getPosition(), 15));
         //System.out.println(Minecraft.getMinecraft().theWorld.getCombinedLight(new BlockPos(0, 0, 0), 15));
-        System.out.println(FluidRegistry.isFluidRegistered("my_fluid"));
+        //LogHelper.infoLog(FluidRegistry.isFluidRegistered("my_fluid"));
+        LogHelper.infoLog("No function assigned");
     }
 
     @Override
@@ -51,7 +54,7 @@ public class DebugCommand implements ICommand{
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
         return null;
     }
 
@@ -62,6 +65,6 @@ public class DebugCommand implements ICommand{
 
     @Override
     public int compareTo(ICommand o) {
-        return 0;
+        return o.getName().compareTo("aiDebug");
     }
 }

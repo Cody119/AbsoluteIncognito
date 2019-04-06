@@ -27,13 +27,12 @@ public interface ICoreContainer extends IItemHandler {
 
     void setCore(ItemStack stack);
 
-    @Nullable
     ItemStack getCoreItemStack();
     @Nullable
     ICore getCoreItem();
 
     default boolean hasCore() {
-        return getCoreItemStack() != null;
+        return !getCoreItemStack().isEmpty();
         //return true;
     }
 
@@ -57,7 +56,7 @@ public interface ICoreContainer extends IItemHandler {
         if (hasCore()) {
             ItemStack cur = getCoreItemStack();
             ItemStack ret = cur.splitStack(amount);
-            if (cur.stackSize > 0) {
+            if (cur.getCount() > 0) {
                 setCore(cur); //this is mostly just to update the nbt and make sure nothing strange happens
             } else {
                 loseCore();

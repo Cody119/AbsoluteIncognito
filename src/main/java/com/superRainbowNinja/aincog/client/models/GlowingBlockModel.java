@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -21,7 +20,7 @@ import java.util.List;
  *
  * TODO this and its sub need to be updted, mostly the nullQuads needs to go (just return an empty list), and change array lists to immutable ones
  */
-public class GlowingBlockModel implements IPerspectiveAwareModel {
+public class GlowingBlockModel implements IBakedModel {
     protected ImmutableList<BakedQuad>[] quads;
     protected ImmutableList<BakedQuad> nullQuads;
     protected TextureAtlasSprite sprite;
@@ -30,7 +29,7 @@ public class GlowingBlockModel implements IPerspectiveAwareModel {
     protected ItemCameraTransforms cameraTransforms;
     protected ItemOverrideList overrideList;
 
-    public GlowingBlockModel(IPerspectiveAwareModel oldModel, List<BakedQuad> glowingQuads, TextureAtlasSprite spriteIn) {
+    public GlowingBlockModel(IBakedModel oldModel, List<BakedQuad> glowingQuads, TextureAtlasSprite spriteIn) {
 
         quads = new ImmutableList[6];
 

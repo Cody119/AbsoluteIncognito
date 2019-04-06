@@ -64,8 +64,8 @@ public class InventoryUpdate extends PacketBase{
 
             final Minecraft mc = Minecraft.getMinecraft();
             mc.addScheduledTask(() -> {
-                LogHelper.infoLog("Packet recived " + mc.thePlayer.getName());
-                mc.thePlayer.inventory.setInventorySlotContents(message.pos, message.stack);
+                LogHelper.infoLog("Packet recived " + mc.player.getName());
+                mc.player.inventory.setInventorySlotContents(message.pos, message.stack);
             });
             return null;
         }

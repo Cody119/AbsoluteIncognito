@@ -44,7 +44,7 @@ public class MachineFrameRender extends TileEntitySpecialRenderer<MachineFrameTi
     }
 
     @Override
-    public void renderTileEntityAt(MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage) {
+    public void render(MachineFrameTile teIn, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(x, y, z);

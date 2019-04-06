@@ -114,17 +114,17 @@ public class ArcFurnaceLogic extends FluidLogic {
             int[] count = new int[rStacks.length];
             for (int i = 0; i < stacks.getSizeInventory(); i++) {
                 ItemStack stack1 = stacks.getStackInSlot(i);
-                if (stack1 != null) {
+                if (!stack1.isEmpty()) {
                     for (int j = 0; j < rStacks.length; j++) {
                         if (compare.apply(stack1, rStacks[j])) {
-                            count[j] += stack1.stackSize;
+                            count[j] += stack1.getCount();
                         }
                     }
                 }
             }
 
             for (int i = 0; i < rStacks.length; i++) {
-                if (rStacks[i].stackSize > count[i]) {
+                if (rStacks[i].getCount() > count[i]) {
                     return false;
                 }
             }
@@ -142,15 +142,15 @@ public class ArcFurnaceLogic extends FluidLogic {
             int[] count = new int[rStacks.length];
 
             for (int i = 0; i < rStacks.length; i++) {
-                count[i] = rStacks[i].stackSize;
+                count[i] = rStacks[i].getCount();
             }
 
             for (int i = 0; i < stacks.getSizeInventory(); i++) {
                 ItemStack stack1 = stacks.getStackInSlot(i);
-                if (stack1 != null) {
+                if (!stack1.isEmpty()) {
                     for (int j = 0; j < rStacks.length; j++) {
                         if (count[j] != 0 && compare.apply(stack1, rStacks[j])) {
-                            int remove = Math.min(count[j], stack1.stackSize);
+                            int remove = Math.min(count[j], stack1.getCount());
                             stacks.decrStackSize(i, remove);
                             count[j] -= remove;
                         }
@@ -280,7 +280,9 @@ public class ArcFurnaceLogic extends FluidLogic {
 
     @Override
     public void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (!FluidUtil.tryFillContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory),Integer.MAX_VALUE,  playerIn) && side != EnumFacing.DOWN && side != EnumFacing.UP) {
+        if (!FluidUtil.tryFillContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory),Integer.MAX_VALUE,  playerIn).isSuccess()
+                && side != EnumFacing.DOWN
+                && side != EnumFacing.UP) {
             InvUtil.insertIntoInvFromPlayer(playerIn, tile, getSlot(side), heldItem);
             //playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem,
             //    ItemHandlerHelper.insertItemStacked(new InvWrapper(te), heldItem, false) //comparing items can be slow, so its just faster to assume it changed
@@ -295,9 +297,9 @@ public class ArcFurnaceLogic extends FluidLogic {
     public void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (side != EnumFacing.UP && side != EnumFacing.DOWN) {
             ItemStack stack = tile.getStackInSlot(getSlot(side));
-            if (stack != null) {
+            if (!stack.isEmpty()) {
                 playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, stack);
-                tile.setInventorySlotContents(getSlot(side), null);
+                tile.removeStackFromSlot(getSlot(side));
                 //te.markVisualDirty(); changing inv contents auto marks dirty
             }
         }
@@ -306,7 +308,7 @@ public class ArcFurnaceLogic extends FluidLogic {
     @Override
     public void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage) {
         ItemStack stack = tile.getStackInSlot(getSlot(EnumFacing.NORTH));
-        if (stack != null) {
+        if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 12f/16f, z + 4f/16f);
             GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);
@@ -316,7 +318,7 @@ public class ArcFurnaceLogic extends FluidLogic {
         }
 
         stack = tile.getStackInSlot(getSlot(EnumFacing.SOUTH));
-        if (stack != null) {
+        if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 12f/16f, z + 12f/16f);
             GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);
@@ -326,7 +328,7 @@ public class ArcFurnaceLogic extends FluidLogic {
         }
 
         stack = tile.getStackInSlot(getSlot(EnumFacing.EAST));
-        if (stack != null) {
+        if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 12f/16f, y + 12f/16f, z + 0.5);
             GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);
@@ -336,7 +338,7 @@ public class ArcFurnaceLogic extends FluidLogic {
         }
 
         stack = tile.getStackInSlot(getSlot(EnumFacing.WEST));
-        if (stack != null) {
+        if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 4f/16f, y + 12f/16f, z + 0.5);
             GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);

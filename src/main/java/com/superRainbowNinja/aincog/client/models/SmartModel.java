@@ -4,7 +4,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -16,8 +15,8 @@ import java.util.List;
  *
  * Might allow for customisation of the other properties later
  */
-public class SmartModel implements IPerspectiveAwareModel {
-    protected IPerspectiveAwareModel baseModel;
+public class SmartModel implements IBakedModel {
+    protected IBakedModel baseModel;
 
     public SmartModelOverride getItemOverrideList() {
         return itemOverrideList;
@@ -25,12 +24,12 @@ public class SmartModel implements IPerspectiveAwareModel {
 
     private SmartModelOverride itemOverrideList;
 
-    public SmartModel(IPerspectiveAwareModel modelIn, SmartModelOverride overrideListIn) {
+    public SmartModel(IBakedModel modelIn, SmartModelOverride overrideListIn) {
         baseModel = modelIn;
         itemOverrideList = overrideListIn;
     }
 
-    public void setBaseModel(IPerspectiveAwareModel model) {
+    public void setBaseModel(IBakedModel model) {
         baseModel = model;
     }
 

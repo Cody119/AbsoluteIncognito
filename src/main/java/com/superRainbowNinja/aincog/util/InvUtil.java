@@ -30,15 +30,15 @@ public class InvUtil {
 
     public static boolean insertIntoSlotFromPlayer(EntityPlayer player, IInventory inv, int slot, ItemStack heldItem) {
         ItemStack stack = inv.getStackInSlot(slot);
-        if (stack == null) {
+        if (stack.isEmpty()) {
             inv.setInventorySlotContents(slot, heldItem.copy());
             player.inventory.removeStackFromSlot(player.inventory.currentItem);
             return true;
         } else if (ItemHandlerHelper.canItemStacksStack(heldItem, stack)){
-            int amount = Math.min(stack.getMaxStackSize() - stack.stackSize, heldItem.stackSize);
-            stack.stackSize += amount;
-            heldItem.stackSize -= amount;
-            if (heldItem.stackSize == 0) {
+            int amount = Math.min(stack.getMaxStackSize() - stack.getCount(), heldItem.getCount());
+            stack.setCount(stack.getCount() + amount);
+            heldItem.setCount(heldItem.getCount() - amount);
+            if (heldItem.getCount() == 0) {
                 player.inventory.removeStackFromSlot(player.inventory.currentItem);
             }
             if (amount != 0) {
@@ -73,13 +73,13 @@ public class InvUtil {
         Vec3d norm = direction.normalize();
         Vec3d spawnPos = norm.add(new Vec3d(pos));
 
-        EntityItem entityitem = new EntityItem(worldIn, spawnPos.xCoord, spawnPos.yCoord, spawnPos.zCoord, stack);
+        EntityItem entityitem = new EntityItem(worldIn, spawnPos.x, spawnPos.y, spawnPos.z, stack);
 
         Vec3d velocity = norm.scale(direction.lengthVector()*0.5);
-        entityitem.motionX = velocity.xCoord;
-        entityitem.motionY = velocity.xCoord;
-        entityitem.motionZ = velocity.xCoord;
-        worldIn.spawnEntityInWorld(entityitem);
+        entityitem.motionX = velocity.x;
+        entityitem.motionY = velocity.y;
+        entityitem.motionZ = velocity.z;
+        worldIn.spawnEntity(entityitem);
     }
 
 }

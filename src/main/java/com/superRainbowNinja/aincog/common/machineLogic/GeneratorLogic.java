@@ -50,11 +50,11 @@ public class GeneratorLogic extends BaseLogic {
             //if the mini buf dosent have enough for one tick and the internal buf has enough for another redstone
             if (rfMiniBuf < rfPerTick && (rfPerTick + rfMiniBuf < (storage.getMaxEnergyStored() - storage.getEnergyStored()))) {
                 ItemStack stack = tile.getStackInSlot(0);
-                if (stack != null) {
-                    stack.stackSize--;
+                if (!stack.isEmpty()) {
+                    stack.setCount(stack.getCount() - 1);
                     rfMiniBuf += getRfPerRedstone(tile);
-                    if (stack.stackSize == 0) {
-                        tile.setInventorySlotContents(0, null);
+                    if (stack.getCount() == 0) {
+                        tile.removeStackFromSlot(0);
                     }
                     if (tile.getCurOp() != Operation.START) {
                         tile.startOp();
@@ -136,9 +136,9 @@ public class GeneratorLogic extends BaseLogic {
     @Override
     public void removeItem(EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = tile.getStackInSlot(0);
-        if (stack != null) {
+        if (!stack.isEmpty()) {
             playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, stack);
-            tile.setInventorySlotContents(0, null);
+            tile.removeStackFromSlot(0);
             tile.markVisualDirty();
         }
     }
@@ -146,7 +146,7 @@ public class GeneratorLogic extends BaseLogic {
     @Override
     public void renderTileEntityAt(MachineFrameRender r, double x, double y, double z, float partialTicks, int destroyStage) {
         ItemStack stack = tile.getStackInSlot(0);
-        if (stack != null) {
+        if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
             GlStateManager.scale(1f / 4, 1f / 4, 1f / 4);

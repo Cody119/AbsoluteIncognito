@@ -84,11 +84,6 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        return false;
-    }
-
-    @Override
     public BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, AGE);
     }
@@ -128,7 +123,10 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
     @Override
     @SideOnly(Side.CLIENT)
     public void registerModels() {
-        super.registerModels();
+        ModelLoader.setCustomModelResourceLocation(this.item, 0,
+                new ModelResourceLocation(getRegistryName().toString(), "age=3"));
+        //LogHelper.infoLog("Test block isssss :" + this.name);
+
         /*
         AbsoluteModelRegistery.INSTANCE.buildAndAddGlowingTexture(new ModelResourceLocation(getRegistryName().toString(), "age=1"), new ResourceLocation("aincog:blocks/gen_ore_stage_1"), 1);
         AbsoluteModelRegistery.INSTANCE.buildAndAddGlowingTexture(new ModelResourceLocation(getRegistryName().toString(), "age=2"), new ResourceLocation("aincog:blocks/gen_ore_stage_2"), 1);
@@ -154,7 +152,7 @@ public class CrystalOre extends AIBlockBase implements IGrowable {
     @SideOnly(Side.CLIENT)
     public class OreColor implements IItemColor, IBlockColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             return color;
         }
 

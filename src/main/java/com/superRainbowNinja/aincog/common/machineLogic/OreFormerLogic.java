@@ -225,9 +225,9 @@ public class OreFormerLogic extends FluidLogic {
 
     @Override
     public void insertItem(EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (FluidUtil.tryFillContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory), Integer.MAX_VALUE,  playerIn))
+        if (FluidUtil.tryFillContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory), Integer.MAX_VALUE,  playerIn).isSuccess())
             tile.markVisualDirty();
-        else if (FluidUtil.tryEmptyContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory), Integer.MAX_VALUE, playerIn)) {
+        else if (FluidUtil.tryEmptyContainerAndStow(heldItem, tank, new InvWrapper(playerIn.inventory), Integer.MAX_VALUE, playerIn).isSuccess()) {
             tile.markVisualDirty();
         }
     }

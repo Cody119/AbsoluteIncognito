@@ -27,13 +27,18 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
 
     public CoreContainerImp(ItemStack stackIn) {
         super(stackIn);
+        if (!stackIn.hasTagCompound()) {
+            stackIn.setTagCompound(new NBTTagCompound());
+        }
     }
 
     @Override
     protected void cache() {
-        NBTTagCompound compound = thisStack.getSubCompound(CAP_KEY, true);
+        NBTTagCompound compound = thisStack.getTagCompound().getCompoundTag(CAP_KEY);
         if (compound.getBoolean(CORE_ITEM)) {
-            core = ItemStack.loadItemStackFromNBT(compound);
+            core = new ItemStack(compound);
+        } else {
+            core = ItemStack.EMPTY;
         }
     }
 
@@ -41,11 +46,11 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
     public boolean setCoreDamage(int dmg) {
         cacheCheck();
         boolean ret = false;
-        if (core != null) {
+        if (!core.isEmpty()) {
             if (((ICore) core.getItem()).setCoreDamage(core, dmg)) {
                 ret = true;
             }
-            core.writeToNBT(thisStack.getSubCompound(CAP_KEY, true));
+            core.writeToNBT(thisStack.getTagCompound().getCompoundTag(CAP_KEY));
         }
         return ret;
     }
@@ -53,22 +58,22 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
     @Override
     public int getCoreMaxDamage() {
         cacheCheck();
-        return core != null ? ((ICore)core.getItem()).getMaxCoreDamage(core) : 0;
+        return !core.isEmpty() ? ((ICore)core.getItem()).getMaxCoreDamage(core) : 0;
     }
 
     @Override
     public int getCoreDamage() {
         cacheCheck();
-        return core != null ? ((ICore)core.getItem()).getCoreDamage(core) : 0;
+        return !core.isEmpty() ? ((ICore)core.getItem()).getCoreDamage(core) : 0;
     }
 
     @Override
     public boolean trySetCore(ItemStack stack, boolean simulate) {
         cacheCheck();
-        if (!hasCore() && stack != null && stack.getItem() instanceof ICore) {
+        if (!hasCore() && stack.getItem() instanceof ICore) {
             if (!simulate){
                 core = stack.copy();
-                core.writeToNBT(thisStack.getSubCompound(CAP_KEY, true)).setBoolean(CORE_ITEM, true);
+                core.writeToNBT(thisStack.getTagCompound().getCompoundTag(CAP_KEY)).setBoolean(CORE_ITEM, true);
             }
             return true;
         } else {
@@ -78,16 +83,16 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
 
     @Override
     public void loseCore() {
-        core = null;
-        thisStack.getSubCompound(CAP_KEY, true).setBoolean(CORE_ITEM, false);
+        core = ItemStack.EMPTY;
+        thisStack.getTagCompound().getCompoundTag(CAP_KEY).setBoolean(CORE_ITEM, false);
     }
 
     @Override
     public void setCore(ItemStack stack) {
         cacheCheck();
-        if (stack != null && stack.getItem() instanceof ICore) {
+        if (!core.isEmpty() && stack.getItem() instanceof ICore) {
             core = stack.copy();
-            core.writeToNBT(thisStack.getSubCompound(CAP_KEY, true)).setBoolean(CORE_ITEM, true);
+            core.writeToNBT(thisStack.getTagCompound().getCompoundTag(CAP_KEY)).setBoolean(CORE_ITEM, true);
         } else {
             throw new RuntimeException("Tried to set invalid core into power weapon cap: " + stack);
         }
@@ -104,7 +109,7 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
     @Override
     public ICore getCoreItem() {
         cacheCheck();
-        return core == null ? null : (ICore) core.getItem();
+        return core.isEmpty() ? null : (ICore) core.getItem();
     }
 
     @Override
@@ -116,5 +121,11 @@ public class CoreContainerImp extends CacheCap implements ICoreContainer, ICapab
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
         return capability == CORE_CONTAINER_CAP || capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
                 ? (T) this : null;
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        cacheCheck();
+        return core.getMaxStackSize() > 1 ? core.getMaxStackSize() : 1;
     }
 }

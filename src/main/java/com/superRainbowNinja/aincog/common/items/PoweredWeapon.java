@@ -18,6 +18,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -164,13 +165,14 @@ public class PoweredWeapon extends CoreContainerItem {
     @Override
     public boolean onEntityItemUpdate(net.minecraft.entity.item.EntityItem entityItem) {
         if (!entityItem.getEntityWorld().isRemote) {
-            updateWeaponInfo(entityItem.getEntityItem(), entityItem.getEntityWorld());
+            updateWeaponInfo(entityItem.getItem(), entityItem.getEntityWorld());
         }
         return false;
     }
 //TODO generifiy so i can use it for other stuff
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack itemStackIn = playerIn.getHeldItem(hand);
         IPoweredWeaponCap cap = IPoweredWeaponCap.getCap(itemStackIn);
         //the gui will not be activated when the word is in the offhand, could change but i dont think its worth it?
         if (playerIn.isSneaking() && hand == EnumHand.MAIN_HAND && !cap.weaponIsOn()) {
@@ -214,7 +216,7 @@ public class PoweredWeapon extends CoreContainerItem {
     @SideOnly(Side.CLIENT)
     public static class CoreColor implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             //should be assured that the sword has a core as the rest of the model has no tint index
             return tintIndex == 1 ? IPoweredWeaponCap.getCap(stack).getCoreItem().getPrimaryColor(stack) :
                     (tintIndex == 2) ? IPoweredWeaponCap.getCap(stack).getCoreItem().getSecondaryColor(stack) :

@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -25,7 +24,7 @@ public class GlowingBlockItemModel extends GlowingBlockModel {
     protected ImmutableList<BakedQuad>[] normalQuads;
     //protected static final ImmutableList<BakedQuad> noQuads = ImmutableList.of();
 
-    public GlowingBlockItemModel(IPerspectiveAwareModel oldModel, List<BakedQuad> glowingQuads, List<BakedQuad> normalQuadsIn, TextureAtlasSprite spriteIn) {
+    public GlowingBlockItemModel(IBakedModel oldModel, List<BakedQuad> glowingQuads, List<BakedQuad> normalQuadsIn, TextureAtlasSprite spriteIn) {
         super(oldModel, glowingQuads, spriteIn);
         itemModel = new ItemModel();
 

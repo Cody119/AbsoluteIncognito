@@ -35,7 +35,7 @@ public final class MathUtil {
     }
 
     public static int getRainbowColor() {
-        WorldClient w = Minecraft.getMinecraft().theWorld;
+        WorldClient w = Minecraft.getMinecraft().world;
         if (w != null) {
             return Color.HSBtoRGB(((w.getTotalWorldTime() % 160)/230f), 0.99f, 0.48f);
         }

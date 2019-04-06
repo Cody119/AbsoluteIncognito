@@ -2,14 +2,17 @@ package com.superRainbowNinja.aincog.common.items;
 
 import com.superRainbowNinja.aincog.common.capabilites.ILockableTank;
 import com.superRainbowNinja.aincog.util.EnumPosition;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -35,7 +38,7 @@ public class TankComponent extends AIItemBase implements IMachineComponent{
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         IFluidTankProperties[] fluidInfo = stack.<ILockableTank>getCapability(ILockableTank.LOCKABLE_TANK_CAPABILITY, EnumFacing.DOWN).getTankProperties();
         if (fluidInfo.length > 0) {
             if (fluidInfo[0].getContents() != null) {
